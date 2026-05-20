@@ -4,7 +4,8 @@ export default function Footer() {
     <footer className="mt-20 bg-gradient-to-br from-wrap-blush via-wrap-cream to-wrap-dusty/40 border-t border-wrap-rose/10">
       <div className="max-w-6xl mx-auto px-5 md:px-8 py-12 grid md:grid-cols-3 gap-8">
         <div>
-          <div className="font-display text-3xl"><span className="text-gradient font-bold">Wrapify</span> ✨</div>
+          <img src="/logo.png" alt="Wrapify" className="h-20 w-auto mb-2" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }} />
+          <div style={{ display: 'none' }} className="font-display text-3xl"><span className="text-gradient font-bold">Wrapify</span> ✨</div>
           <p className="text-sm text-wrap-plum/70 mt-2 italic">Build it. Wrap it. Gift it your way.</p>
         </div>
         <div className="text-sm">

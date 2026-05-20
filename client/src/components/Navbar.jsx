@@ -7,10 +7,13 @@ export default function Navbar({ onCartOpen }) {
 
   return (
     <header className="sticky top-0 z-40 backdrop-blur-xl bg-white/60 border-b border-wrap-rose/10 shadow-soft">
-      <div className="max-w-6xl mx-auto flex items-center justify-between px-5 md:px-8 py-4">
-        <Link to="/" className="font-display text-2xl tracking-tight group flex items-center gap-1">
-          <span className="text-gradient font-bold group-hover:scale-105 inline-block transition-transform">Wrapify</span>
-          <span className="text-wrap-pink group-hover:animate-wiggle inline-block">✨</span>
+      <div className="max-w-6xl mx-auto flex items-center justify-between px-5 md:px-8 py-3">
+        <Link to="/" className="group flex items-center gap-2">
+          <img src="/logo.png" alt="Wrapify" className="h-12 md:h-14 w-auto group-hover:scale-105 transition-transform" onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'inline'; }} />
+          <span style={{ display: 'none' }} className="font-display text-2xl tracking-tight">
+            <span className="text-gradient font-bold">Wrapify</span>
+            <span className="text-wrap-pink ml-1">✨</span>
+          </span>
         </Link>
         <nav className="hidden md:flex items-center gap-2">
           <Link to="/" className={`btn-ghost ${loc.pathname === '/' ? 'bg-wrap-blush/60 text-wrap-rose' : ''}`}>Home</Link>
