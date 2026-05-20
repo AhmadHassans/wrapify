@@ -1,0 +1,44 @@
+name: Deploy to cPanel
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull latest from remote on cPanel
+        env:
+          USER: ${{ secrets.CPANEL_USER }}
+          HOST: ${{ secrets.CPANEL_HOST }}
+          TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
+        run: |
+          REPO_ROOT="%2Fhome%2F${USER}%2Fwrapify-source"
+          echo "Pulling from remote..."
+          RESP=$(curl -fsS \
+            -H "Authorization: cpanel ${USER}:${TOKEN}" \
+            "https://${HOST}:2083/execute/VersionControl/update?repository_root=${REPO_ROOT}")
+          echo "$RESP"
+          echo "$RESP" | grep -q '"status":1' || (echo "Pull failed" && exit 1)
+
+      - name: Wait briefly
+        run: sleep 4
+
+      - name: Trigger cPanel deploy (.cpanel.yml)
+        env:
+          USER: ${{ secrets.CPANEL_USER }}
+          HOST: ${{ secrets.CPANEL_HOST }}
+          TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
+        run: |
+          REPO_ROOT="%2Fhome%2F${USER}%2Fwrapify-source"
+          echo "Triggering deploy..."
+          RESP=$(curl -fsS \
+            -H "Authorization: cpanel ${USER}:${TOKEN}" \
+            "https://${HOST}:2083/execute/VersionControlDeployment/create?repository_root=${REPO_ROOT}")
+          echo "$RESP"
+          echo "$RESP" | grep -q '"status":1' || (echo "Deploy failed" && exit 1)
+
+      - name: Done
+        run: echo "✅ Deployment triggered successfully. Live in ~30-60s."
