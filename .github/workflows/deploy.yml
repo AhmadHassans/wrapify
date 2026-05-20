@@ -9,24 +9,13 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: List registered cPanel git repos (debug)
-        env:
-          USER: ${{ secrets.CPANEL_USER }}
-          HOST: ${{ secrets.CPANEL_HOST }}
-          TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
-        run: |
-          echo "Listing all registered cPanel VCS repos..."
-          curl -fsS \
-            -H "Authorization: cpanel ${USER}:${TOKEN}" \
-            "https://${HOST}:2083/execute/VersionControl/retrieve" | sed "s/${USER}/CPANEL_USER/g"
-
       - name: Pull latest from remote on cPanel
         env:
           USER: ${{ secrets.CPANEL_USER }}
           HOST: ${{ secrets.CPANEL_HOST }}
           TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
         run: |
-          REPO_ROOT="%2Fhome%2F${USER}%2Fhome%2F${USER}%2Fwrapify-source"
+          REPO_ROOT="%2Fhome%2F${USER}%2F%2Fhome%2F${USER}%2Fwrapify-source"
           echo "Pulling from remote..."
           RESP=$(curl -fsS \
             -H "Authorization: cpanel ${USER}:${TOKEN}" \
@@ -43,7 +32,7 @@ jobs:
           HOST: ${{ secrets.CPANEL_HOST }}
           TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
         run: |
-          REPO_ROOT="%2Fhome%2F${USER}%2Fhome%2F${USER}%2Fwrapify-source"
+          REPO_ROOT="%2Fhome%2F${USER}%2F%2Fhome%2F${USER}%2Fwrapify-source"
           echo "Triggering deploy..."
           RESP=$(curl -fsS \
             -H "Authorization: cpanel ${USER}:${TOKEN}" \
