@@ -63,13 +63,13 @@ export default function HomePage() {
             ✦ Orders open till 20th Eid · Limited slots ⏳
           </span>
           <h1 className="font-display text-5xl md:text-7xl leading-[1.05] animate-fadeUp">
-            <span className="text-gradient">Build Your Own</span>
+            <span className="text-gradient">Build it. Wrap it.</span>
             <br />
-            <span className="text-wrap-plum">Eidi Hamper</span>
+            <span className="text-wrap-plum">Gift it your way.</span>
             <span className="inline-block animate-float ml-2">🎁</span>
           </h1>
           <p className="mt-6 text-lg md:text-xl text-wrap-plum/75 max-w-xl mx-auto animate-fadeUp italic" style={{ animationDelay: '120ms' }}>
-            Build it. Wrap it. Gift it your way.
+            Custom Eidi hampers, packed with love 💖
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-3 animate-fadeUp" style={{ animationDelay: '240ms' }}>
             <Link to="/build" className="btn-primary text-base">
