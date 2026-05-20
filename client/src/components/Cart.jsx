@@ -26,19 +26,23 @@ export default function Cart({ open, onClose }) {
           ) : (
             <ul className="space-y-4">
               {items.map((it) => (
-                <li key={`${it.id}:${it.variant || ''}`} className="flex gap-3">
+                <li key={`${it.id}:${it.variant || ''}:${it.size || ''}`} className="flex gap-3">
                   {it.image && (
                     <img src={imgUrl(it.image)} alt="" className="w-16 h-16 rounded-2xl object-cover bg-wrap-blush" />
                   )}
                   <div className="flex-1">
                     <div className="font-medium text-sm">{it.name}</div>
-                    {it.variant && <div className="text-xs text-wrap-plum/60">{it.variant}</div>}
+                    {(it.variant || it.size) && (
+                      <div className="text-xs text-wrap-plum/60">
+                        {[it.size, it.variant].filter(Boolean).join(' · ')}
+                      </div>
+                    )}
                     <div className="text-sm font-display mt-1">Rs.{(it.price + (it.variantPriceAdd || 0)) * it.qty}</div>
                     <div className="flex items-center gap-2 mt-1">
-                      <button onClick={() => updateQty(it.id, it.variant, it.qty - 1)} className="w-6 h-6 rounded-full bg-wrap-blush">-</button>
+                      <button onClick={() => updateQty(it.id, it.variant, it.size, it.qty - 1)} className="w-6 h-6 rounded-full bg-wrap-blush">-</button>
                       <span className="text-sm">{it.qty}</span>
-                      <button onClick={() => updateQty(it.id, it.variant, it.qty + 1)} className="w-6 h-6 rounded-full bg-wrap-blush">+</button>
-                      <button onClick={() => removeItem(it.id, it.variant)} className="ml-auto text-xs text-wrap-plum/60 hover:text-wrap-pink">remove</button>
+                      <button onClick={() => updateQty(it.id, it.variant, it.size, it.qty + 1)} className="w-6 h-6 rounded-full bg-wrap-blush">+</button>
+                      <button onClick={() => removeItem(it.id, it.variant, it.size)} className="ml-auto text-xs text-wrap-plum/60 hover:text-wrap-pink">remove</button>
                     </div>
                   </div>
                 </li>

@@ -31,38 +31,40 @@ export function CartProvider({ children }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ items, packaging, addons, notes, budget }));
   }, [items, packaging, addons, notes, budget]);
 
-  const addItem = (product, variant = null) => {
+  const addItem = (product, variant = null, size = null, qty = 1) => {
     setItems(prev => {
-      const key = `${product.id}:${variant?.color || ''}`;
-      const idx = prev.findIndex(p => `${p.id}:${p.variant || ''}` === key);
+      const key = `${product.id}:${variant?.color || ''}:${size?.name || ''}`;
+      const idx = prev.findIndex(p => `${p.id}:${p.variant || ''}:${p.size || ''}` === key);
       if (idx >= 0) {
         const next = [...prev];
-        next[idx] = { ...next[idx], qty: next[idx].qty + 1 };
+        next[idx] = { ...next[idx], qty: next[idx].qty + qty };
         return next;
       }
       const variantPriceAdd = variant ? Number(variant.price_add) || 0 : 0;
+      const unitPrice = size ? (Number(size.price) || 0) : (Number(product.price) || 0);
       return [
         ...prev,
         {
           id: product.id,
           name: product.name,
-          price: Number(product.price) || 0,
+          price: unitPrice,
           variantPriceAdd,
           variant: variant ? variant.color : null,
+          size: size ? size.name : null,
           image: variant?.image || product.images?.[0] || '',
-          qty: 1
+          qty
         }
       ];
     });
   };
 
-  const removeItem = (id, variant = null) => {
-    setItems(prev => prev.filter(p => !(p.id === id && (p.variant || null) === (variant || null))));
+  const removeItem = (id, variant = null, size = null) => {
+    setItems(prev => prev.filter(p => !(p.id === id && (p.variant || null) === (variant || null) && (p.size || null) === (size || null))));
   };
 
-  const updateQty = (id, variant, qty) => {
+  const updateQty = (id, variant, size, qty) => {
     setItems(prev => prev
-      .map(p => (p.id === id && (p.variant || null) === (variant || null)) ? { ...p, qty: Math.max(1, qty) } : p)
+      .map(p => (p.id === id && (p.variant || null) === (variant || null) && (p.size || null) === (size || null)) ? { ...p, qty: Math.max(1, qty) } : p)
     );
   };
 

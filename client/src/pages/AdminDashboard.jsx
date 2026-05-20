@@ -252,6 +252,7 @@ function ProductForm({ initial, onDone }) {
   const [newImages, setNewImages] = useState([]);
   const [variants, setVariants] = useState(initial?.variants || []);
   const [variantFiles, setVariantFiles] = useState({});
+  const [sizes, setSizes] = useState(initial?.sizes || []);
   const [saving, setSaving] = useState(false);
 
   const isEdit = !!initial;
@@ -271,6 +272,7 @@ function ProductForm({ initial, onDone }) {
       fd.append('deals', deals);
       fd.append('existing_images', JSON.stringify(existingImages));
       fd.append('variants', JSON.stringify(variants));
+      fd.append('sizes', JSON.stringify(sizes));
       newImages.forEach(f => fd.append('images', f));
       Object.entries(variantFiles).forEach(([key, file]) => fd.append(key, file));
 
@@ -294,6 +296,12 @@ function ProductForm({ initial, onDone }) {
   };
   const updateVariant = (i, field, val) => {
     setVariants(variants.map((v, idx) => idx === i ? { ...v, [field]: val } : v));
+  };
+
+  const addSize = () => setSizes([...sizes, { name: '', price: 0 }]);
+  const removeSize = (i) => setSizes(sizes.filter((_, idx) => idx !== i));
+  const updateSize = (i, field, val) => {
+    setSizes(sizes.map((s, idx) => idx === i ? { ...s, [field]: field === 'price' ? Number(val) : val } : s));
   };
 
   return (
@@ -412,6 +420,34 @@ function ProductForm({ initial, onDone }) {
                 className="text-xs"
               />
               <button type="button" onClick={() => removeVariant(i)} className="btn-ghost text-red-500">×</button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <div className="text-sm font-medium">Sizes (per-size pricing — overrides base price)</div>
+          <button type="button" onClick={addSize} className="btn-ghost text-sm">+ Add Size</button>
+        </div>
+        {sizes.length === 0 && <div className="text-sm text-wrap-plum/60">No sizes. Customer sees base price only.</div>}
+        <div className="space-y-3">
+          {sizes.map((s, i) => (
+            <div key={i} className="flex flex-wrap items-center gap-3 p-3 bg-emerald-50/60 rounded-2xl">
+              <input
+                value={s.name}
+                onChange={e => updateSize(i, 'name', e.target.value)}
+                placeholder="Size (e.g. Small, Medium, 250ml)"
+                className="input flex-1 min-w-[180px]"
+              />
+              <input
+                type="number"
+                value={s.price}
+                onChange={e => updateSize(i, 'price', e.target.value)}
+                placeholder="Price Rs."
+                className="input w-32"
+              />
+              <button type="button" onClick={() => removeSize(i)} className="btn-ghost text-red-500">×</button>
             </div>
           ))}
         </div>
