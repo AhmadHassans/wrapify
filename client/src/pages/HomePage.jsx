@@ -59,20 +59,20 @@ export default function HomePage() {
 
         <div className="relative max-w-6xl mx-auto px-5 md:px-8 pt-20 pb-28 md:pt-32 md:pb-40 text-center z-10">
           <span className="chip bg-white/70 text-wrap-rose mb-6 backdrop-blur-md border border-wrap-rose/20 shadow-soft animate-fadeIn">
-            ✦ Orders open till 20th Eid · Limited slots ⏳
+            ✦ Orders open till 20th | Limited slots
           </span>
           <h1 className="font-display text-5xl md:text-7xl leading-[1.05] animate-fadeUp">
-            <span className="text-gradient">Build it. Wrap it.</span>
+            <span className="text-gradient">Build Your Own</span>
             <br />
-            <span className="text-wrap-plum">Gift it your way.</span>
+            <span className="text-wrap-plum">Eidi Hamper</span>
             <span className="inline-block animate-float ml-2">🎁</span>
           </h1>
           <p className="mt-6 text-lg md:text-xl text-wrap-plum/75 max-w-xl mx-auto animate-fadeUp italic" style={{ animationDelay: '120ms' }}>
-            Custom Eidi hampers, packed with love 💖
+            Cute. Custom. Made for your loved ones 💖
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-3 animate-fadeUp" style={{ animationDelay: '240ms' }}>
             <Link to="/build" className="btn-primary text-base">
-              Start Building <span className="ml-1 animate-bounceSoft inline-block">💖</span>
+              Start Building
             </Link>
             <a href="#products" className="btn-outline text-base">Ready-Made Hampers</a>
           </div>

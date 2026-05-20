@@ -143,6 +143,17 @@ function seedIfEmpty() {
       deals: ''
     },
     {
+      name: 'Extra Items',
+      description: 'Surprise extras tucked in — sweets, mini gifts, ribbons.',
+      price: 150,
+      label: '',
+      packaging_type: '',
+      is_addon: 1,
+      images: ['seed_card.svg'],
+      variants: [],
+      deals: ''
+    },
+    {
       name: 'Basket Packaging',
       description: 'Cane basket with ribbon and filler.',
       price: 200,
