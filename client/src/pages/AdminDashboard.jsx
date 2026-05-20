@@ -143,6 +143,8 @@ function OrdersTable({ orders, reload }) {
   const [expanded, setExpanded] = useState(null);
   const statusColor = (s) => ({
     pending: 'bg-amber-100 text-amber-700',
+    pending_payment: 'bg-orange-100 text-orange-700',
+    pending_verification: 'bg-purple-100 text-purple-700',
     confirmed: 'bg-blue-100 text-blue-700',
     delivered: 'bg-emerald-100 text-emerald-700',
     cancelled: 'bg-gray-100 text-gray-500'
@@ -191,6 +193,8 @@ function OrdersTable({ orders, reload }) {
                       className={`chip ${statusColor(o.status)} cursor-pointer`}
                     >
                       <option value="pending">Pending</option>
+                      <option value="pending_payment">Pending Payment</option>
+                      <option value="pending_verification">Pending Verification</option>
                       <option value="confirmed">Confirmed</option>
                       <option value="delivered">Delivered</option>
                       <option value="cancelled">Cancelled</option>
@@ -201,10 +205,12 @@ function OrdersTable({ orders, reload }) {
                 {expanded === o.id && (
                   <tr className="bg-wrap-blush/40">
                     <td colSpan={7} className="p-4">
-                      <div className="grid md:grid-cols-2 gap-4 text-sm">
+                      <div className="grid md:grid-cols-3 gap-4 text-sm">
                         <div>
-                          <div className="font-medium mb-1">Address</div>
-                          <div>{o.address}</div>
+                          <div className="font-medium mb-1">Customer</div>
+                          <div>{o.customer_name}</div>
+                          <div>{o.phone}</div>
+                          <div className="mt-2">{o.address}</div>
                           {o.budget && <div className="mt-2 text-wrap-plum/70">Budget: {o.budget}</div>}
                           {o.notes && <div className="mt-2"><span className="font-medium">Notes: </span>{o.notes}</div>}
                           {o.packaging && <div className="mt-2"><span className="font-medium">Packaging: </span>{o.packaging}</div>}
@@ -213,7 +219,7 @@ function OrdersTable({ orders, reload }) {
                           <div className="font-medium mb-1">Items</div>
                           <ul className="space-y-1">
                             {o.items.map((it, i) => (
-                              <li key={i}>• {it.name || `Product #${it.id}`}{it.variant ? ` (${it.variant})` : ''} x{it.qty}</li>
+                              <li key={i}>• {it.name || `Product #${it.id}`}{it.size ? ` (${it.size})` : ''}{it.variant ? ` · ${it.variant}` : ''} x{it.qty}</li>
                             ))}
                           </ul>
                           {o.addons.length > 0 && (
@@ -223,6 +229,26 @@ function OrdersTable({ orders, reload }) {
                                 {o.addons.map((a, i) => <li key={i}>• {a.name || `Add-on #${a.id}`}</li>)}
                               </ul>
                             </>
+                          )}
+                        </div>
+                        <div>
+                          <div className="font-medium mb-1">Payment Proof</div>
+                          {o.payment_method && o.payment_method !== 'COD' ? (
+                            <div className="space-y-1">
+                              <div><span className="font-medium">Method: </span>{o.payment_method}</div>
+                              {o.sender_details && <div><span className="font-medium">Sender: </span>{o.sender_details}</div>}
+                              {o.trx_id && <div><span className="font-medium">TRX ID: </span><span className="font-mono">{o.trx_id}</span></div>}
+                              {o.receipt_image ? (
+                                <a href={`/api/receipts/${o.receipt_image}`} target="_blank" rel="noreferrer" className="block mt-2">
+                                  <img src={`/api/receipts/${o.receipt_image}`} className="w-full max-w-[200px] rounded-lg border border-wrap-pink/30 hover:shadow-pop transition" />
+                                  <div className="text-xs text-wrap-rose mt-1 hover:underline">View full size →</div>
+                                </a>
+                              ) : (
+                                <div className="text-xs text-wrap-plum/60 mt-2 italic">Receipt not uploaded yet</div>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="text-wrap-plum/60 italic">{o.payment_method === 'COD' ? 'Cash on Delivery' : '—'}</div>
                           )}
                         </div>
                       </div>

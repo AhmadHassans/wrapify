@@ -271,11 +271,22 @@ const orders = {
       budget: obj.budget || '',
       total_price: Number(obj.total_price) || 0,
       status: obj.status || 'pending',
+      sender_details: obj.sender_details || '',
+      trx_id: obj.trx_id || '',
+      receipt_image: obj.receipt_image || '',
       created_at: nowStamp()
     };
     state.orders.push(row);
     save();
     return row;
+  },
+  updatePayment(id, patch) {
+    const n = Number(id);
+    const idx = state.orders.findIndex(o => o.id === n);
+    if (idx === -1) return null;
+    state.orders[idx] = { ...state.orders[idx], ...patch };
+    save();
+    return state.orders[idx];
   },
   updateStatus(id, status) {
     const n = Number(id);

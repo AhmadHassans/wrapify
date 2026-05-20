@@ -1,7 +1,36 @@
 const express = require('express');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const crypto = require('crypto');
+
 const db = require('../db');
 
 const router = express.Router();
+
+const receiptsDir = path.join(__dirname, '..', 'uploads', 'receipts');
+if (!fs.existsSync(receiptsDir)) fs.mkdirSync(receiptsDir, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination: receiptsDir,
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const safe = `r${Date.now()}_${crypto.randomBytes(6).toString('hex')}${ext}`;
+    cb(null, safe);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  const ok = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg'].includes(file.mimetype);
+  if (!ok) return cb(new Error('Only jpeg/png/webp images allowed'));
+  cb(null, true);
+};
+
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: { fileSize: 5 * 1024 * 1024, files: 1 }
+});
 
 const formatOrder = (o) => ({
   ...o,
@@ -41,6 +70,11 @@ const computeTotal = ({ items = [], packaging, addons = [] }) => {
   return total;
 };
 
+const needsVerification = (method) => {
+  const m = (method || '').toLowerCase();
+  return ['jazzcash', 'easypaisa', 'bank transfer', 'bank'].includes(m);
+};
+
 router.post('/', (req, res) => {
   const {
     customer_name, address, phone, payment_method,
@@ -60,6 +94,8 @@ router.post('/', (req, res) => {
     return res.status(400).json({ error: 'Total mismatch', serverTotal });
   }
 
+  const status = needsVerification(payment_method) ? 'pending_payment' : 'pending';
+
   const row = db.orders.insert({
     customer_name,
     address,
@@ -71,10 +107,38 @@ router.post('/', (req, res) => {
     notes,
     budget,
     total_price: serverTotal,
-    status: 'pending'
+    status
   });
 
-  res.status(201).json(formatOrder(row));
+  res.status(201).json({
+    ...formatOrder(row),
+    payment_proof_required: needsVerification(payment_method)
+  });
+});
+
+router.post('/:id/payment-proof', upload.single('receipt'), (req, res) => {
+  const order = db.orders.get(req.params.id);
+  if (!order) return res.status(404).json({ error: 'Order not found' });
+  if (order.status === 'confirmed' || order.status === 'delivered') {
+    return res.status(400).json({ error: 'Order already confirmed' });
+  }
+
+  const { sender_details = '', trx_id = '' } = req.body || {};
+  if (!sender_details || !trx_id) {
+    return res.status(400).json({ error: 'sender_details and trx_id required' });
+  }
+  if (!req.file) {
+    return res.status(400).json({ error: 'Receipt screenshot required' });
+  }
+
+  const updated = db.orders.updatePayment(order.id, {
+    sender_details: String(sender_details).trim(),
+    trx_id: String(trx_id).trim(),
+    receipt_image: req.file.filename,
+    status: 'pending_verification'
+  });
+
+  res.json({ success: true, order: formatOrder(updated) });
 });
 
 router.get('/', (req, res) => {
@@ -89,7 +153,7 @@ router.get('/:id', (req, res) => {
 
 router.put('/:id/status', (req, res) => {
   const { status } = req.body;
-  const allowed = ['pending', 'confirmed', 'delivered', 'cancelled'];
+  const allowed = ['pending', 'pending_payment', 'pending_verification', 'confirmed', 'delivered', 'cancelled'];
   if (!allowed.includes(status)) return res.status(400).json({ error: 'Invalid status' });
   const updated = db.orders.updateStatus(req.params.id, status);
   if (!updated) return res.status(404).json({ error: 'Not found' });

@@ -25,6 +25,10 @@ app.use('/api/uploads', express.static(uploadsDir, {
   maxAge: '7d',
   setHeaders: (res) => res.set('Cross-Origin-Resource-Policy', 'cross-origin')
 }));
+app.use('/api/receipts', express.static(path.join(uploadsDir, 'receipts'), {
+  maxAge: '7d',
+  setHeaders: (res) => res.set('Cross-Origin-Resource-Policy', 'cross-origin')
+}));
 
 app.use('/api/products', productsRouter);
 app.use('/api/orders', ordersRouter);

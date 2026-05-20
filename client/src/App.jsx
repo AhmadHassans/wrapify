@@ -4,6 +4,7 @@ import BuildHamper from './pages/BuildHamper.jsx';
 import AdminLogin from './pages/AdminLogin.jsx';
 import AdminDashboard from './pages/AdminDashboard.jsx';
 import PaymentResult from './pages/PaymentResult.jsx';
+import PaymentProof from './pages/PaymentProof.jsx';
 import ProductDetail from './pages/ProductDetail.jsx';
 import ChatWidget from './components/ChatWidget.jsx';
 
@@ -21,6 +22,7 @@ export default function App() {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/payment/success" element={<PaymentResult success={true} />} />
         <Route path="/payment/fail" element={<PaymentResult success={false} />} />
+        <Route path="/payment/proof/:orderId" element={<PaymentProof />} />
         <Route path="*" element={<HomePage />} />
       </Routes>
       {!isAdmin && <ChatWidget />}

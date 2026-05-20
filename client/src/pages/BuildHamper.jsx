@@ -80,14 +80,9 @@ export default function BuildHamper() {
       };
       const res = await api.post('/api/orders', payload);
 
-      const method = (form.payment_method || '').toLowerCase();
-      if (method === 'jazzcash' || method === 'easypaisa') {
-        const init = await api.post(`/api/payments/initiate/${res.id}`, {});
-        if (init.url && init.fields) {
-          submitToGateway(init.url, init.fields);
-          return;
-        }
-        alert('Payment gateway unavailable. Order saved as pending.');
+      if (res.payment_proof_required) {
+        nav(`/payment/proof/${res.id}`);
+        return;
       }
 
       setOrderResult(res);
@@ -96,22 +91,6 @@ export default function BuildHamper() {
     } finally {
       setSubmitting(false);
     }
-  };
-
-  const submitToGateway = (url, fields) => {
-    const f = document.createElement('form');
-    f.method = 'POST';
-    f.action = url;
-    f.style.display = 'none';
-    Object.entries(fields).forEach(([k, v]) => {
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = k;
-      input.value = v == null ? '' : String(v);
-      f.appendChild(input);
-    });
-    document.body.appendChild(f);
-    f.submit();
   };
 
   const waMessage = useMemo(() => {
@@ -299,27 +278,19 @@ export default function BuildHamper() {
                   <PayBtn active={form.payment_method === 'COD'} onClick={() => setForm({ ...form, payment_method: 'COD' })}>
                     💵 Cash on Delivery
                   </PayBtn>
-                  <PayBtn
-                    active={form.payment_method === 'jazzcash'}
-                    onClick={() => setForm({ ...form, payment_method: 'jazzcash' })}
-                    disabled={!paymentStatus.jazzcash}
-                  >
-                    📱 JazzCash {!paymentStatus.jazzcash && <span className="text-xs ml-1 opacity-70">(soon)</span>}
+                  <PayBtn active={form.payment_method === 'jazzcash'} onClick={() => setForm({ ...form, payment_method: 'jazzcash' })}>
+                    📱 JazzCash
                   </PayBtn>
-                  <PayBtn
-                    active={form.payment_method === 'easypaisa'}
-                    onClick={() => setForm({ ...form, payment_method: 'easypaisa' })}
-                    disabled={!paymentStatus.easypaisa}
-                  >
-                    💚 EasyPaisa {!paymentStatus.easypaisa && <span className="text-xs ml-1 opacity-70">(soon)</span>}
+                  <PayBtn active={form.payment_method === 'easypaisa'} onClick={() => setForm({ ...form, payment_method: 'easypaisa' })}>
+                    💚 EasyPaisa
                   </PayBtn>
                   <PayBtn active={form.payment_method === 'Bank Transfer'} onClick={() => setForm({ ...form, payment_method: 'Bank Transfer' })}>
                     🏦 Bank Transfer
                   </PayBtn>
                 </div>
-                {(form.payment_method === 'jazzcash' || form.payment_method === 'easypaisa') && (
+                {(form.payment_method !== 'COD') && (
                   <p className="text-xs text-wrap-plum/60 mt-2">
-                    You will be redirected to {form.payment_method === 'jazzcash' ? 'JazzCash' : 'EasyPaisa'} to complete payment securely.
+                    After placing order, you'll see account details to pay manually and upload a receipt screenshot for verification.
                   </p>
                 )}
               </div>
