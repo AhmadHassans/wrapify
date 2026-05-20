@@ -212,8 +212,7 @@ export default function ProductDetail() {
                 </button>
               </div>
 
-              <div className="mt-8 pt-6 border-t border-wrap-rose/10 grid grid-cols-3 gap-4 text-center text-xs text-wrap-plum/70">
-                <div>🚚<div className="mt-1">Free delivery</div></div>
+              <div className="mt-8 pt-6 border-t border-wrap-rose/10 grid grid-cols-2 gap-4 text-center text-xs text-wrap-plum/70">
                 <div>🎁<div className="mt-1">Gift wrapped</div></div>
                 <div>💌<div className="mt-1">Custom note</div></div>
               </div>

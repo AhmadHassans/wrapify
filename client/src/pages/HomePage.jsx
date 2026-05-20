@@ -23,7 +23,6 @@ const PACKAGING_LABELS = {
 const TRUST = [
   '✨ Handcrafted with love',
   '💌 Personalized notes',
-  '🚚 Free Karachi delivery',
   '🎀 Eid-ready packaging',
   '💖 Custom themes',
   '⚡ Same-day dispatch'
