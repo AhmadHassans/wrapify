@@ -278,13 +278,29 @@ function ProductForm({ initial, onDone }) {
   const [newImages, setNewImages] = useState([]);
   const [variants, setVariants] = useState(initial?.variants || []);
   const [variantFiles, setVariantFiles] = useState({});
-  const [sizes, setSizes] = useState(initial?.sizes || []);
+  const FIXED_SIZES = ['Small', 'Medium', 'Large'];
+  const [sizeState, setSizeState] = useState(() => {
+    const base = { Small: { enabled: false, price: '' }, Medium: { enabled: false, price: '' }, Large: { enabled: false, price: '' } };
+    (initial?.sizes || []).forEach(s => {
+      if (base[s.name]) base[s.name] = { enabled: true, price: s.price };
+    });
+    return base;
+  });
   const [saving, setSaving] = useState(false);
 
   const isEdit = !!initial;
 
   const submit = async (e) => {
     e.preventDefault();
+    const sizes = FIXED_SIZES
+      .filter(n => sizeState[n].enabled)
+      .map(n => ({ name: n, price: Number(sizeState[n].price) }));
+    for (const s of sizes) {
+      if (!s.price || s.price <= 0) {
+        alert(`Price required for ${s.name} (must be greater than 0).`);
+        return;
+      }
+    }
     setSaving(true);
     try {
       const fd = new FormData();
@@ -324,11 +340,8 @@ function ProductForm({ initial, onDone }) {
     setVariants(variants.map((v, idx) => idx === i ? { ...v, [field]: val } : v));
   };
 
-  const addSize = () => setSizes([...sizes, { name: '', price: 0 }]);
-  const removeSize = (i) => setSizes(sizes.filter((_, idx) => idx !== i));
-  const updateSize = (i, field, val) => {
-    setSizes(sizes.map((s, idx) => idx === i ? { ...s, [field]: field === 'price' ? Number(val) : val } : s));
-  };
+  const toggleSize = (n) => setSizeState({ ...sizeState, [n]: { ...sizeState[n], enabled: !sizeState[n].enabled } });
+  const setSizePrice = (n, val) => setSizeState({ ...sizeState, [n]: { ...sizeState[n], price: val } });
 
   return (
     <form onSubmit={submit} className="card p-6 space-y-5">
@@ -452,30 +465,35 @@ function ProductForm({ initial, onDone }) {
       </div>
 
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <div className="text-sm font-medium">Sizes (per-size pricing — overrides base price)</div>
-          <button type="button" onClick={addSize} className="btn-ghost text-sm">+ Add Size</button>
-        </div>
-        {sizes.length === 0 && <div className="text-sm text-wrap-plum/60">No sizes. Customer sees base price only.</div>}
+        <div className="text-sm font-medium mb-2">Sizes (per-size pricing — overrides base price)</div>
+        <div className="text-xs text-wrap-plum/60 mb-3">Tick a size to offer it. Price is required when enabled.</div>
         <div className="space-y-3">
-          {sizes.map((s, i) => (
-            <div key={i} className="flex flex-wrap items-center gap-3 p-3 bg-emerald-50/60 rounded-2xl">
-              <input
-                value={s.name}
-                onChange={e => updateSize(i, 'name', e.target.value)}
-                placeholder="Size (e.g. Small, Medium, 250ml)"
-                className="input flex-1 min-w-[180px]"
-              />
-              <input
-                type="number"
-                value={s.price}
-                onChange={e => updateSize(i, 'price', e.target.value)}
-                placeholder="Price Rs."
-                className="input w-32"
-              />
-              <button type="button" onClick={() => removeSize(i)} className="btn-ghost text-red-500">×</button>
-            </div>
-          ))}
+          {FIXED_SIZES.map(n => {
+            const st = sizeState[n];
+            return (
+              <div key={n} className="flex flex-wrap items-center gap-3 p-3 bg-emerald-50/60 rounded-2xl">
+                <label className="flex items-center gap-2 min-w-[140px] cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={st.enabled}
+                    onChange={() => toggleSize(n)}
+                    className="w-5 h-5 accent-wrap-pink"
+                  />
+                  <span className="font-medium">{n}</span>
+                </label>
+                <input
+                  type="number"
+                  value={st.price}
+                  onChange={e => setSizePrice(n, e.target.value)}
+                  placeholder={`${n} Price Rs.`}
+                  required={st.enabled}
+                  disabled={!st.enabled}
+                  min="1"
+                  className="input flex-1 min-w-[160px] disabled:opacity-50 disabled:cursor-not-allowed"
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
 
