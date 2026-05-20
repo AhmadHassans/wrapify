@@ -13,6 +13,7 @@ export default function Footer() {
             <li><a href="/" className="hover:text-wrap-pink">Home</a></li>
             <li><a href="/build" className="hover:text-wrap-pink">Build Hamper</a></li>
             <li><a href="/#products" className="hover:text-wrap-pink">Ready Hampers</a></li>
+            <li><a href="/admin/login" className="hover:text-wrap-pink">🔐 Admin</a></li>
           </ul>
         </div>
         <div className="text-sm">
@@ -29,7 +30,6 @@ export default function Footer() {
       </div>
       <div className="text-center text-xs text-wrap-plum/50 pb-6">
         © {new Date().getFullYear()} Wrapify. Made with 💖
-        <a href="/admin/login" className="ml-2 text-wrap-plum/20 hover:text-wrap-rose transition-colors" title="Admin">·</a>
       </div>
     </footer>
   );
