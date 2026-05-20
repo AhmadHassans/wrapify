@@ -2,17 +2,20 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/wrapvrrz/wrapify
+    - export PUBLICHTML=/home/wrapvrrz/public_html
+    - export SRC=/home/wrapvrrz/home/wrapvrrz/wrapify-source
     - /bin/mkdir -p $DEPLOYPATH/server/routes
     - /bin/mkdir -p $DEPLOYPATH/server/uploads
     - /bin/mkdir -p $DEPLOYPATH/client/dist/assets
     - /bin/mkdir -p $DEPLOYPATH/tmp
-    - /bin/cp -R server/*.js $DEPLOYPATH/server/
-    - /bin/cp -R server/routes/*.js $DEPLOYPATH/server/routes/
-    - /bin/cp -R server/uploads/*.svg $DEPLOYPATH/server/uploads/ 2>/dev/null || true
-    - /bin/cp -R client/dist/* $DEPLOYPATH/client/dist/
-    - /bin/cp package.json $DEPLOYPATH/
-    - /bin/cp package-lock.json $DEPLOYPATH/ 2>/dev/null || true
-    - /bin/cp .env.example $DEPLOYPATH/ 2>/dev/null || true
+    - /bin/cp -R $SRC/server/*.js $DEPLOYPATH/server/
+    - /bin/cp -R $SRC/server/routes/*.js $DEPLOYPATH/server/routes/
+    - /bin/cp -R $SRC/server/uploads/*.svg $DEPLOYPATH/server/uploads/ 2>/dev/null || true
+    - /bin/cp -R $SRC/client/dist/* $DEPLOYPATH/client/dist/
+    - /bin/cp -R $SRC/client/dist/* $PUBLICHTML/
+    - /bin/cp $SRC/package.json $DEPLOYPATH/
+    - /bin/cp $SRC/package-lock.json $DEPLOYPATH/ 2>/dev/null || true
+    - /bin/cp $SRC/.env.example $DEPLOYPATH/ 2>/dev/null || true
     - cd $DEPLOYPATH && /home/wrapvrrz/nodevenv/wrapify/20/bin/npm install --omit=dev
     - /usr/bin/touch $DEPLOYPATH/tmp/restart.txt
     - /usr/bin/touch $DEPLOYPATH/server/index.js

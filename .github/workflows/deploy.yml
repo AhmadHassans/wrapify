@@ -15,7 +15,7 @@ jobs:
           HOST: ${{ secrets.CPANEL_HOST }}
           TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
         run: |
-          REPO_ROOT="%2Fhome%2F${USER}%2F%2Fhome%2F${USER}%2Fwrapify-source"
+          REPO_ROOT="%2Fhome%2F${USER}%2Fwrapify-source"
           echo "Pulling from remote..."
           RESP=$(curl -fsS \
             -H "Authorization: cpanel ${USER}:${TOKEN}" \
@@ -32,7 +32,7 @@ jobs:
           HOST: ${{ secrets.CPANEL_HOST }}
           TOKEN: ${{ secrets.CPANEL_API_TOKEN }}
         run: |
-          REPO_ROOT="%2Fhome%2F${USER}%2F%2Fhome%2F${USER}%2Fwrapify-source"
+          REPO_ROOT="%2Fhome%2F${USER}%2Fwrapify-source"
           echo "Triggering deploy..."
           RESP=$(curl -fsS \
             -H "Authorization: cpanel ${USER}:${TOKEN}" \
