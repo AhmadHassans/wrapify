@@ -5,7 +5,7 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto px-5 md:px-8 py-12 grid md:grid-cols-3 gap-8">
         <div>
           <div className="font-display text-3xl"><span className="text-gradient font-bold">Wrapify</span> ✨</div>
-          <p className="text-sm text-wrap-plum/70 mt-2 italic">Cute. Custom. Made for your loved ones.</p>
+          <p className="text-sm text-wrap-plum/70 mt-2 italic">Build it. Wrap it. Gift it your way.</p>
         </div>
         <div className="text-sm">
           <div className="font-medium mb-2">Quick Links</div>

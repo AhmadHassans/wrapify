@@ -69,7 +69,7 @@ export default function HomePage() {
             <span className="inline-block animate-float ml-2">🎁</span>
           </h1>
           <p className="mt-6 text-lg md:text-xl text-wrap-plum/75 max-w-xl mx-auto animate-fadeUp italic" style={{ animationDelay: '120ms' }}>
-            Cute. Custom. Made for your loved ones.
+            Build it. Wrap it. Gift it your way.
           </p>
           <div className="mt-10 flex flex-wrap justify-center gap-3 animate-fadeUp" style={{ animationDelay: '240ms' }}>
             <Link to="/build" className="btn-primary text-base">
