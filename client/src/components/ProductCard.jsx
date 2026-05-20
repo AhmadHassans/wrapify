@@ -26,29 +26,20 @@ export default function ProductCard({ product, compact = false }) {
   const [bursting, setBursting] = useState(false);
 
   const hasVariants = product.variants && product.variants.length > 0;
-  const hasSizes = product.sizes && product.sizes.length > 0;
   const selectedVariant = hasVariants ? product.variants[variantIdx] : null;
-  const defaultSize = hasSizes ? product.sizes[0] : null;
   const displayImage = useMemo(() => {
     if (selectedVariant?.image) return selectedVariant.image;
     return product.images?.[imgIdx] || product.images?.[0] || '';
   }, [selectedVariant, product.images, imgIdx]);
 
   const priceDisplay = useMemo(() => {
-    if (hasSizes) {
-      const prices = product.sizes.map(s => Number(s.price) || 0);
-      const min = Math.min(...prices);
-      const max = Math.max(...prices);
-      if (min === max) return `Rs.${min}`;
-      return `Rs.${min} – Rs.${max}`;
-    }
     return `Rs.${Number(product.price) + (selectedVariant?.price_add || 0)}`;
-  }, [hasSizes, product, selectedVariant]);
+  }, [product, selectedVariant]);
 
   const handleAdd = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    addItem(product, selectedVariant, defaultSize, 1);
+    addItem(product, selectedVariant, 1);
     setAdded(true);
     setBursting(true);
     setTimeout(() => setBursting(false), 700);
@@ -131,12 +122,6 @@ export default function ProductCard({ product, compact = false }) {
                   className={`w-7 h-7 rounded-full border-2 transition-all duration-300 ${i === variantIdx ? 'border-wrap-rose scale-110 shadow-pop' : 'border-white shadow-soft hover:scale-105'}`}
                 />
               ))}
-            </div>
-          )}
-
-          {hasSizes && (
-            <div className="mt-2 text-xs text-wrap-plum/60">
-              {product.sizes.length} size{product.sizes.length === 1 ? '' : 's'} available
             </div>
           )}
 

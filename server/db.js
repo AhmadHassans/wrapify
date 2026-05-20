@@ -189,7 +189,6 @@ function seedIfEmpty() {
     state.products.push({
       id: state.nextProductId++,
       ...p,
-      sizes: Array.isArray(p.sizes) ? p.sizes : [],
       is_active: 1,
       created_at: nowStamp()
     });
@@ -222,7 +221,6 @@ const products = {
       is_addon: obj.is_addon ? 1 : 0,
       images: Array.isArray(obj.images) ? obj.images : [],
       variants: Array.isArray(obj.variants) ? obj.variants : [],
-      sizes: Array.isArray(obj.sizes) ? obj.sizes : [],
       deals: obj.deals || '',
       is_active: obj.is_active === 0 ? 0 : 1,
       created_at: nowStamp()

@@ -219,7 +219,7 @@ function OrdersTable({ orders, reload }) {
                           <div className="font-medium mb-1">Items</div>
                           <ul className="space-y-1">
                             {o.items.map((it, i) => (
-                              <li key={i}>• {it.name || `Product #${it.id}`}{it.size ? ` (${it.size})` : ''}{it.variant ? ` · ${it.variant}` : ''} x{it.qty}</li>
+                              <li key={i}>• {it.name || `Product #${it.id}`}{it.variant ? ` · ${it.variant}` : ''} x{it.qty}</li>
                             ))}
                           </ul>
                           {o.addons.length > 0 && (
@@ -278,29 +278,12 @@ function ProductForm({ initial, onDone }) {
   const [newImages, setNewImages] = useState([]);
   const [variants, setVariants] = useState(initial?.variants || []);
   const [variantFiles, setVariantFiles] = useState({});
-  const FIXED_SIZES = ['Small', 'Medium', 'Large'];
-  const [sizeState, setSizeState] = useState(() => {
-    const base = { Small: { enabled: false, price: '' }, Medium: { enabled: false, price: '' }, Large: { enabled: false, price: '' } };
-    (initial?.sizes || []).forEach(s => {
-      if (base[s.name]) base[s.name] = { enabled: true, price: s.price };
-    });
-    return base;
-  });
   const [saving, setSaving] = useState(false);
 
   const isEdit = !!initial;
 
   const submit = async (e) => {
     e.preventDefault();
-    const sizes = FIXED_SIZES
-      .filter(n => sizeState[n].enabled)
-      .map(n => ({ name: n, price: Number(sizeState[n].price) }));
-    for (const s of sizes) {
-      if (!s.price || s.price <= 0) {
-        alert(`Price required for ${s.name} (must be greater than 0).`);
-        return;
-      }
-    }
     setSaving(true);
     try {
       const fd = new FormData();
@@ -314,7 +297,6 @@ function ProductForm({ initial, onDone }) {
       fd.append('deals', deals);
       fd.append('existing_images', JSON.stringify(existingImages));
       fd.append('variants', JSON.stringify(variants));
-      fd.append('sizes', JSON.stringify(sizes));
       newImages.forEach(f => fd.append('images', f));
       Object.entries(variantFiles).forEach(([key, file]) => fd.append(key, file));
 
@@ -339,9 +321,6 @@ function ProductForm({ initial, onDone }) {
   const updateVariant = (i, field, val) => {
     setVariants(variants.map((v, idx) => idx === i ? { ...v, [field]: val } : v));
   };
-
-  const toggleSize = (n) => setSizeState({ ...sizeState, [n]: { ...sizeState[n], enabled: !sizeState[n].enabled } });
-  const setSizePrice = (n, val) => setSizeState({ ...sizeState, [n]: { ...sizeState[n], price: val } });
 
   return (
     <form onSubmit={submit} className="card p-6 space-y-5">
@@ -464,38 +443,6 @@ function ProductForm({ initial, onDone }) {
         </div>
       </div>
 
-      <div>
-        <div className="text-sm font-medium mb-2">Sizes (per-size pricing — overrides base price)</div>
-        <div className="text-xs text-wrap-plum/60 mb-3">Tick a size to offer it. Price is required when enabled.</div>
-        <div className="space-y-3">
-          {FIXED_SIZES.map(n => {
-            const st = sizeState[n];
-            return (
-              <div key={n} className="flex flex-wrap items-center gap-3 p-3 bg-emerald-50/60 rounded-2xl">
-                <label className="flex items-center gap-2 min-w-[140px] cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={st.enabled}
-                    onChange={() => toggleSize(n)}
-                    className="w-5 h-5 accent-wrap-pink"
-                  />
-                  <span className="font-medium">{n}</span>
-                </label>
-                <input
-                  type="number"
-                  value={st.price}
-                  onChange={e => setSizePrice(n, e.target.value)}
-                  placeholder={`${n} Price Rs.`}
-                  required={st.enabled}
-                  disabled={!st.enabled}
-                  min="1"
-                  className="input flex-1 min-w-[160px] disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-              </div>
-            );
-          })}
-        </div>
-      </div>
 
       <div className="flex justify-end gap-2 pt-3 border-t border-wrap-blush">
         <button type="button" onClick={onDone} className="btn-outline">Cancel</button>

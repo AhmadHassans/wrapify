@@ -38,8 +38,7 @@ const formatProduct = (p) => ({
   is_addon: !!p.is_addon,
   is_active: !!p.is_active,
   images: Array.isArray(p.images) ? p.images : [],
-  variants: Array.isArray(p.variants) ? p.variants : [],
-  sizes: Array.isArray(p.sizes) ? p.sizes : []
+  variants: Array.isArray(p.variants) ? p.variants : []
 });
 
 router.get('/', (req, res) => {
@@ -59,16 +58,6 @@ const parseVariantsField = (raw) => {
   try {
     const v = JSON.parse(raw);
     return Array.isArray(v) ? v : [];
-  } catch { return []; }
-};
-
-const parseSizesField = (raw) => {
-  if (!raw) return [];
-  if (Array.isArray(raw)) return raw;
-  try {
-    const v = JSON.parse(raw);
-    if (!Array.isArray(v)) return [];
-    return v.map(s => ({ name: String(s.name || ''), price: Number(s.price) || 0 })).filter(s => s.name);
   } catch { return []; }
 };
 
@@ -101,8 +90,6 @@ router.post('/', upload.any(), (req, res) => {
     if (variantFileMap[key]) v.image = variantFileMap[key];
   });
 
-  const sizes = parseSizesField(req.body.sizes);
-
   const row = db.products.insert({
     name,
     description,
@@ -112,7 +99,6 @@ router.post('/', upload.any(), (req, res) => {
     is_addon: is_addon === '1' || is_addon === 1 || is_addon === true ? 1 : 0,
     images,
     variants,
-    sizes,
     deals,
     is_active: is_active === '0' || is_active === 0 ? 0 : 1
   });
@@ -150,10 +136,6 @@ router.put('/:id', upload.any(), (req, res) => {
     if (variantFileMap[key]) v.image = variantFileMap[key];
   });
 
-  const sizes = body.sizes !== undefined
-    ? parseSizesField(body.sizes)
-    : (Array.isArray(existing.sizes) ? existing.sizes : []);
-
   const patch = {
     name: body.name ?? existing.name,
     description: body.description ?? existing.description,
@@ -165,7 +147,6 @@ router.put('/:id', upload.any(), (req, res) => {
       : existing.is_addon,
     images,
     variants,
-    sizes,
     deals: body.deals ?? existing.deals,
     is_active: body.is_active !== undefined
       ? (body.is_active === '0' || body.is_active === 0 ? 0 : 1)

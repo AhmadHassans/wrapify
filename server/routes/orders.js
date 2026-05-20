@@ -44,11 +44,6 @@ const computeTotal = ({ items = [], packaging, addons = [] }) => {
     const p = db.products.get(it.id);
     if (!p) continue;
     let unit = Number(p.price) || 0;
-    if (it.size) {
-      const sizes = Array.isArray(p.sizes) ? p.sizes : [];
-      const s = sizes.find(s => s.name === it.size);
-      if (s) unit = Number(s.price) || unit;
-    }
     if (it.variant) {
       const variants = Array.isArray(p.variants) ? p.variants : [];
       const v = variants.find(v => v.color === it.variant);

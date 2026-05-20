@@ -8,9 +8,9 @@ import Reveal from '../components/Reveal.jsx';
 import { api, imgUrl } from '../lib/api.js';
 
 const STEPS = [
-  { icon: '🎯', title: 'Set Your Budget', desc: 'Tell us how much you want to spend.' },
-  { icon: '🛍️', title: 'Choose Your Items', desc: 'Mix and match goodies for your loved one.' },
-  { icon: '📦', title: 'We Pack & Deliver', desc: 'We wrap with love and deliver to your door.' }
+  { icon: '🎯', title: 'Set Your Budget', desc: 'Tell us how much you want to spend.', to: '/build' },
+  { icon: '🛍️', title: 'Choose Your Items', desc: 'Mix and match goodies for your loved one.', to: '/build' },
+  { icon: '📦', title: 'We Pack & Deliver', desc: 'We wrap with love and deliver to your door.', to: '/build' }
 ];
 
 const PACKAGING_LABELS = {
@@ -105,11 +105,11 @@ export default function HomePage() {
         <div className="grid md:grid-cols-3 gap-6">
           {STEPS.map((s, i) => (
             <Reveal key={i} delay={i * 120}>
-              <div className="card p-8 text-center hover:shadow-pop hover:-translate-y-2 transition-all group">
+              <Link to={s.to} className="card p-8 text-center hover:shadow-pop hover:-translate-y-2 transition-all group block cursor-pointer">
                 <div className="w-20 h-20 mx-auto mb-5 rounded-full bg-gradient-to-br from-wrap-blush via-wrap-dusty/50 to-wrap-pink/20 flex items-center justify-center text-4xl shadow-soft group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500">{s.icon}</div>
-                <h3 className="font-display text-xl text-wrap-plum">{s.title}</h3>
+                <h3 className="font-display text-xl text-wrap-plum group-hover:text-wrap-rose transition-colors">{s.title}</h3>
                 <p className="text-sm text-wrap-plum/70 mt-2">{s.desc}</p>
-              </div>
+              </Link>
             </Reveal>
           ))}
         </div>
