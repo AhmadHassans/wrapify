@@ -18,7 +18,7 @@ jobs:
           echo "Listing all registered cPanel VCS repos..."
           curl -fsS \
             -H "Authorization: cpanel ${USER}:${TOKEN}" \
-            "https://${HOST}:2083/execute/VersionControl/list" | sed "s/${USER}/CPANEL_USER/g"
+            "https://${HOST}:2083/execute/VersionControl/retrieve" | sed "s/${USER}/CPANEL_USER/g"
 
       - name: Pull latest from remote on cPanel
         env:
