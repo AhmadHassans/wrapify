@@ -83,6 +83,11 @@ router.post('/', (req, res) => {
   if (!Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ error: 'Cart empty' });
   }
+  for (const it of items) {
+    if (!db.products.get(it.id)) {
+      return res.status(400).json({ error: `Product ${it.id} not found` });
+    }
+  }
 
   const serverTotal = computeTotal({ items, packaging, addons });
   if (Math.abs(serverTotal - Number(total_price)) > 1) {

@@ -18,6 +18,9 @@ try {
   state.orders ||= [];
   state.nextProductId ||= 1;
   state.nextOrderId ||= 1;
+  let migrated = 0;
+  state.products.forEach(p => { if ('sizes' in p) { delete p.sizes; migrated++; } });
+  if (migrated) console.log('[db] migration: removed sizes field from', migrated, 'products');
 } catch {
   state = JSON.parse(JSON.stringify(initial));
 }
