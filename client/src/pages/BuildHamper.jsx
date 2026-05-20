@@ -33,6 +33,11 @@ export default function BuildHamper() {
   const [submitting, setSubmitting] = useState(false);
   const [orderResult, setOrderResult] = useState(null);
   const [form, setForm] = useState({ customer_name: '', address: '', phone: '', payment_method: 'COD' });
+  const [paymentStatus, setPaymentStatus] = useState({ jazzcash: false, easypaisa: false });
+
+  useEffect(() => {
+    fetch('/api/payments/status').then(r => r.json()).then(setPaymentStatus).catch(() => {});
+  }, []);
   const [customBudget, setCustomBudget] = useState('');
 
   const cart = useCart();
@@ -74,12 +79,39 @@ export default function BuildHamper() {
         total_price: total
       };
       const res = await api.post('/api/orders', payload);
+
+      const method = (form.payment_method || '').toLowerCase();
+      if (method === 'jazzcash' || method === 'easypaisa') {
+        const init = await api.post(`/api/payments/initiate/${res.id}`, {});
+        if (init.url && init.fields) {
+          submitToGateway(init.url, init.fields);
+          return;
+        }
+        alert('Payment gateway unavailable. Order saved as pending.');
+      }
+
       setOrderResult(res);
     } catch (e) {
       alert('Order failed: ' + e.message);
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const submitToGateway = (url, fields) => {
+    const f = document.createElement('form');
+    f.method = 'POST';
+    f.action = url;
+    f.style.display = 'none';
+    Object.entries(fields).forEach(([k, v]) => {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = k;
+      input.value = v == null ? '' : String(v);
+      f.appendChild(input);
+    });
+    document.body.appendChild(f);
+    f.submit();
   };
 
   const waMessage = useMemo(() => {
@@ -262,18 +294,34 @@ export default function BuildHamper() {
               <Input label="Address" value={form.address} onChange={v => setForm({ ...form, address: v })} />
               <Input label="Phone (WhatsApp)" value={form.phone} onChange={v => setForm({ ...form, phone: v })} />
               <div>
-                <label className="text-sm text-wrap-plum/70 mb-1 block">Payment Method</label>
-                <div className="flex gap-2">
-                  {['COD', 'Bank Transfer'].map(m => (
-                    <button
-                      key={m}
-                      onClick={() => setForm({ ...form, payment_method: m })}
-                      className={`flex-1 btn ${form.payment_method === m ? 'bg-wrap-pink text-white' : 'bg-white border border-wrap-pink text-wrap-plum'}`}
-                    >
-                      {m === 'COD' ? '💵 Cash on Delivery' : '🏦 Bank Transfer'}
-                    </button>
-                  ))}
+                <label className="text-sm text-wrap-plum/70 mb-2 block">Payment Method</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <PayBtn active={form.payment_method === 'COD'} onClick={() => setForm({ ...form, payment_method: 'COD' })}>
+                    💵 Cash on Delivery
+                  </PayBtn>
+                  <PayBtn
+                    active={form.payment_method === 'jazzcash'}
+                    onClick={() => setForm({ ...form, payment_method: 'jazzcash' })}
+                    disabled={!paymentStatus.jazzcash}
+                  >
+                    📱 JazzCash {!paymentStatus.jazzcash && <span className="text-xs ml-1 opacity-70">(soon)</span>}
+                  </PayBtn>
+                  <PayBtn
+                    active={form.payment_method === 'easypaisa'}
+                    onClick={() => setForm({ ...form, payment_method: 'easypaisa' })}
+                    disabled={!paymentStatus.easypaisa}
+                  >
+                    💚 EasyPaisa {!paymentStatus.easypaisa && <span className="text-xs ml-1 opacity-70">(soon)</span>}
+                  </PayBtn>
+                  <PayBtn active={form.payment_method === 'Bank Transfer'} onClick={() => setForm({ ...form, payment_method: 'Bank Transfer' })}>
+                    🏦 Bank Transfer
+                  </PayBtn>
                 </div>
+                {(form.payment_method === 'jazzcash' || form.payment_method === 'easypaisa') && (
+                  <p className="text-xs text-wrap-plum/60 mt-2">
+                    You will be redirected to {form.payment_method === 'jazzcash' ? 'JazzCash' : 'EasyPaisa'} to complete payment securely.
+                  </p>
+                )}
               </div>
               <div className="card p-4 mt-4 bg-wrap-blush">
                 <div className="flex justify-between"><span>Items</span><span>Rs.{cart.itemsTotal}</span></div>
@@ -327,6 +375,18 @@ function StepDots({ step }) {
         </div>
       ))}
     </div>
+  );
+}
+
+function PayBtn({ active, onClick, disabled, children }) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`btn text-sm ${active ? 'bg-gradient-to-r from-wrap-pink to-wrap-rose text-white' : 'bg-white border border-wrap-pink/40 text-wrap-plum'} ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:shadow-pop'}`}
+    >
+      {children}
+    </button>
   );
 }
 

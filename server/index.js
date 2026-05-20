@@ -9,6 +9,7 @@ const productsRouter = require('./routes/products');
 const ordersRouter = require('./routes/orders');
 const adminRouter = require('./routes/admin');
 const chatRouter = require('./routes/chat');
+const paymentsRouter = require('./routes/payments');
 
 const app = express();
 const PORT = process.env.PORT || 5050;
@@ -29,6 +30,7 @@ app.use('/api/products', productsRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/chat', chatRouter);
+app.use('/api/payments', paymentsRouter);
 
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 

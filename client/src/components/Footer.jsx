@@ -27,7 +27,10 @@ export default function Footer() {
           </a>
         </div>
       </div>
-      <div className="text-center text-xs text-wrap-plum/50 pb-6">© {new Date().getFullYear()} Wrapify. Made with 💖</div>
+      <div className="text-center text-xs text-wrap-plum/50 pb-6">
+        © {new Date().getFullYear()} Wrapify. Made with 💖
+        <a href="/admin/login" className="ml-2 text-wrap-plum/20 hover:text-wrap-rose transition-colors" title="Admin">·</a>
+      </div>
     </footer>
   );
 }
