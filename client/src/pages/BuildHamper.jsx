@@ -224,12 +224,15 @@ export default function BuildHamper() {
                   <button
                     key={p.id}
                     onClick={() => setPackaging({ id: p.id, name: meta.name, price: p.price, type: p.packaging_type })}
-                    className={`card p-5 text-center transition ${selected ? 'ring-2 ring-wrap-pink' : ''}`}
+                    className={`card p-5 text-center transition flex flex-col ${selected ? 'ring-2 ring-wrap-pink' : ''}`}
                   >
                     <div className="text-4xl mb-2">{meta.emoji}</div>
                     {p.images?.[0] && <img src={thumbUrl(p.images[0])} alt="" loading="lazy" decoding="async" width="400" height="280" className="w-full h-28 object-cover rounded-2xl mb-2" />}
                     <div className="font-display">{meta.name}</div>
-                    <div className="text-wrap-plum/70 text-sm">Rs.{p.price}</div>
+                    {p.description && (
+                      <div className="text-xs text-wrap-plum/60 mt-1 leading-snug">{p.description}</div>
+                    )}
+                    <div className="text-wrap-rose font-semibold text-sm mt-2">Rs.{p.price}</div>
                   </button>
                 );
               })}
