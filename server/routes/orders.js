@@ -5,6 +5,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 
 const db = require('../db');
+const notify = require('../lib/notify');
 
 const router = express.Router();
 
@@ -115,6 +116,16 @@ router.post('/', (req, res) => {
     status
   });
 
+  const enrichedItems = items.map(it => {
+    const p = db.products.get(it.id);
+    return { ...it, name: p ? p.name : `Product #${it.id}` };
+  });
+  const enrichedAddons = addons.map(a => {
+    const p = db.products.get(a.id);
+    return { ...a, name: p ? p.name : `Add-on #${a.id}` };
+  });
+  notify.newOrder({ ...row, items: enrichedItems, addons: enrichedAddons }).catch(e => console.error('[notify] newOrder failed', e));
+
   res.status(201).json({
     ...formatOrder(row),
     payment_proof_required: needsVerification(payment_method)
@@ -142,6 +153,19 @@ router.post('/:id/payment-proof', upload.single('receipt'), (req, res) => {
     receipt_image: req.file.filename,
     status: 'pending_verification'
   });
+
+  const enrichedUpdated = {
+    ...updated,
+    items: (updated.items || []).map(it => {
+      const p = db.products.get(it.id);
+      return { ...it, name: it.name || (p ? p.name : `Product #${it.id}`) };
+    }),
+    addons: (updated.addons || []).map(a => {
+      const p = db.products.get(a.id);
+      return { ...a, name: a.name || (p ? p.name : `Add-on #${a.id}`) };
+    })
+  };
+  notify.paymentProof(enrichedUpdated).catch(e => console.error('[notify] paymentProof failed', e));
 
   res.json({ success: true, order: formatOrder(updated) });
 });
