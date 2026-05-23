@@ -184,7 +184,7 @@ export default function HomePage() {
             const meta = PACKAGING_LABELS[p.packaging_type] || { name: p.name, emoji: '📦' };
             return (
               <Reveal key={p.id} delay={i * 80}>
-                <div className="card p-5 text-center hover:shadow-pop hover:-translate-y-1 transition-all group cursor-pointer">
+                <Link to={`/product/${p.id}`} className="card p-5 text-center hover:shadow-pop hover:-translate-y-1 transition-all group cursor-pointer block">
                   <div className="text-5xl mb-2 inline-block group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">{meta.emoji}</div>
                   {p.images?.[0] && (
                     <div className="overflow-hidden rounded-2xl mb-3">
@@ -193,7 +193,7 @@ export default function HomePage() {
                   )}
                   <div className="font-display text-lg">{meta.name}</div>
                   <div className="text-wrap-rose font-semibold text-sm mt-1">Rs.{p.price}</div>
-                </div>
+                </Link>
               </Reveal>
             );
           })}

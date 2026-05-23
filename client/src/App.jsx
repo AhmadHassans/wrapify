@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import { Routes, Route, useLocation, useNavigationType } from 'react-router-dom';
 import HomePage from './pages/HomePage.jsx';
 import BuildHamper from './pages/BuildHamper.jsx';
@@ -9,22 +9,29 @@ import PaymentProof from './pages/PaymentProof.jsx';
 import ProductDetail from './pages/ProductDetail.jsx';
 import ChatWidget from './components/ChatWidget.jsx';
 
+if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
+  window.history.scrollRestoration = 'manual';
+}
+
 function ScrollManager() {
   const loc = useLocation();
   const navType = useNavigationType();
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const key = loc.key || 'default';
 
     if (navType === 'POP') {
       const saved = sessionStorage.getItem(`scroll:${key}`);
       if (saved !== null) {
-        window.scrollTo(0, parseInt(saved, 10));
+        const y = parseInt(saved, 10);
+        window.scrollTo(0, y);
+        requestAnimationFrame(() => window.scrollTo(0, y));
         return;
       }
     }
 
     window.scrollTo(0, 0);
+    requestAnimationFrame(() => window.scrollTo(0, 0));
   }, [loc.key, navType]);
 
   useEffect(() => {
