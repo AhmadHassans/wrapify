@@ -14,7 +14,7 @@ export default function AdminLogin() {
     try {
       await api.post('/api/admin/login', { password });
       localStorage.setItem('wrapify_admin', '1');
-      nav('/admin');
+      nav('/admin', { replace: true });
     } catch (e) {
       setError(e.message || 'Wrong password');
     } finally {

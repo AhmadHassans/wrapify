@@ -33,7 +33,29 @@ export default function AdminDashboard() {
 
   useEffect(() => { loadProducts(); loadOrders(); }, []);
 
-  const logout = () => { localStorage.removeItem('wrapify_admin'); nav('/admin/login'); };
+  const formOpen = creating || !!editing || tab === 'add';
+
+  useEffect(() => {
+    if (!formOpen) return;
+
+    window.history.pushState({ wrapifyAdminForm: true }, '');
+
+    const onPop = () => {
+      setCreating(false);
+      setEditing(null);
+      setTab(prev => prev === 'add' ? 'items' : prev);
+    };
+    window.addEventListener('popstate', onPop);
+
+    return () => {
+      window.removeEventListener('popstate', onPop);
+      if (window.history.state && window.history.state.wrapifyAdminForm) {
+        window.history.back();
+      }
+    };
+  }, [formOpen]);
+
+  const logout = () => { localStorage.removeItem('wrapify_admin'); nav('/admin/login', { replace: true }); };
 
   const counts = {
     items: products.filter(filterByTab('items')).length,
@@ -45,7 +67,7 @@ export default function AdminDashboard() {
 
   const switchTab = (id) => { setTab(id); setEditing(null); setCreating(false); };
 
-  const showForm = creating || editing || tab === 'add';
+  const showForm = formOpen;
   const formType = editing
     ? (editing.is_addon ? 'addons' : (editing.packaging_type ? 'packaging' : 'items'))
     : (tab === 'add' ? 'all' : tab);
