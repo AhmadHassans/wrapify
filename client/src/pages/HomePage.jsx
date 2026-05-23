@@ -9,7 +9,7 @@ import { api, imgUrl, thumbUrl } from '../lib/api.js';
 
 const STEPS = [
   { icon: '🎯', title: 'Set Your Budget', desc: 'Tell us how much you want to spend.', to: '/build' },
-  { icon: '🛍️', title: 'Choose Your Items', desc: 'Mix and match goodies for your loved one.', to: '/build' },
+  { icon: '🛍️', title: 'Choose Your Items', desc: 'Mix and match goodies for your loved one.', scrollTo: 'products' },
   { icon: '📦', title: 'We Pack & Deliver', desc: 'We wrap with love and deliver to your door.', to: '/build' }
 ];
 
@@ -98,15 +98,38 @@ export default function HomePage() {
           </div>
         </Reveal>
         <div className="grid md:grid-cols-3 gap-6">
-          {STEPS.map((s, i) => (
-            <Reveal key={i} delay={i * 120}>
-              <Link to={s.to} className="card p-8 text-center hover:shadow-pop hover:-translate-y-2 transition-all group block cursor-pointer">
+          {STEPS.map((s, i) => {
+            const inner = (
+              <>
                 <div className="w-20 h-20 mx-auto mb-5 rounded-full bg-gradient-to-br from-wrap-blush via-wrap-dusty/50 to-wrap-pink/20 flex items-center justify-center text-4xl shadow-soft group-hover:scale-110 group-hover:rotate-6 transition-transform duration-500">{s.icon}</div>
                 <h3 className="font-display text-xl text-wrap-plum group-hover:text-wrap-rose transition-colors">{s.title}</h3>
                 <p className="text-sm text-wrap-plum/70 mt-2">{s.desc}</p>
-              </Link>
-            </Reveal>
-          ))}
+              </>
+            );
+            const cls = 'card p-8 text-center hover:shadow-pop hover:-translate-y-2 transition-all group block cursor-pointer';
+
+            return (
+              <Reveal key={i} delay={i * 120}>
+                {s.scrollTo ? (
+                  <a
+                    href={`#${s.scrollTo}`}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      const el = document.getElementById(s.scrollTo);
+                      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                    className={cls}
+                  >
+                    {inner}
+                  </a>
+                ) : (
+                  <Link to={s.to} className={cls}>
+                    {inner}
+                  </Link>
+                )}
+              </Reveal>
+            );
+          })}
         </div>
       </section>
 
