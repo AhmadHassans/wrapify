@@ -18,6 +18,8 @@ const swatchHex = (name) => {
   return map[(name || '').toLowerCase()] || '#e89bb0';
 };
 
+const variantColor = (v) => v?.hex || swatchHex(v?.color);
+
 export default function ProductCard({ product, compact = false }) {
   const { addItem } = useCart();
   const [variantIdx, setVariantIdx] = useState(0);
@@ -132,7 +134,7 @@ export default function ProductCard({ product, compact = false }) {
                   key={i}
                   onClick={(e) => handleSwatch(e, i)}
                   title={v.color}
-                  style={{ background: swatchHex(v.color) }}
+                  style={{ background: variantColor(v) }}
                   className={`w-7 h-7 rounded-full border-2 transition-all duration-300 ${i === variantIdx ? 'border-wrap-rose scale-110 shadow-pop' : 'border-white shadow-soft hover:scale-105'}`}
                 />
               ))}

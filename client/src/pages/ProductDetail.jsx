@@ -17,6 +17,8 @@ const swatchHex = (name) => {
   return map[(name || '').toLowerCase()] || '#e89bb0';
 };
 
+const variantColor = (v) => v?.hex || swatchHex(v?.color);
+
 export default function ProductDetail() {
   const { id } = useParams();
   const nav = useNavigate();
@@ -194,7 +196,7 @@ export default function ProductDetail() {
                         key={i}
                         onClick={() => setVariantIdx(i)}
                         title={v.color}
-                        style={{ background: swatchHex(v.color) }}
+                        style={{ background: variantColor(v) }}
                         className={`w-10 h-10 rounded-full border-2 transition-all ${i === variantIdx ? 'border-wrap-rose scale-110 shadow-pop' : 'border-white shadow-soft hover:scale-105'}`}
                       />
                     ))}

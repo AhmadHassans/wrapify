@@ -387,7 +387,7 @@ function ProductForm({ initial, formType = 'items', onDone }) {
   const toggleSize = (n) => setSizeState({ ...sizeState, [n]: { ...sizeState[n], enabled: !sizeState[n].enabled } });
   const setSizePrice = (n, val) => setSizeState({ ...sizeState, [n]: { ...sizeState[n], price: val } });
 
-  const addVariant = () => setVariants([...variants, { color: '', price_add: 0, image: '' }]);
+  const addVariant = () => setVariants([...variants, { color: '', hex: '#e89bb0', price_add: 0, image: '' }]);
   const removeVariant = (i) => {
     setVariants(variants.filter((_, idx) => idx !== i));
     const next = { ...variantFiles }; delete next[`variant_image_${i}`]; setVariantFiles(next);
@@ -534,37 +534,52 @@ function ProductForm({ initial, formType = 'items', onDone }) {
           </div>
           {variants.length === 0 && <div className="text-sm text-wrap-plum/60">No variants. Customers will see base product only.</div>}
           <div className="space-y-3">
-            {variants.map((v, i) => (
-              <div key={i} className="flex flex-wrap items-center gap-3 p-3 bg-wrap-blush/40 rounded-2xl">
-                <input
-                  value={v.color}
-                  onChange={e => updateVariant(i, 'color', e.target.value)}
-                  placeholder="Color name"
-                  className="input flex-1 min-w-[140px]"
-                />
-                <input
-                  type="number"
-                  value={v.price_add}
-                  onChange={e => updateVariant(i, 'price_add', Number(e.target.value))}
-                  placeholder="+Rs."
-                  className="input w-28"
-                />
-                {v.image && (
-                  <img src={thumbUrl(v.image)} alt="" loading="lazy" decoding="async" width="48" height="48" className="w-12 h-12 rounded-xl object-cover" />
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={e => {
-                    const file = e.target.files?.[0];
-                    if (!file) return;
-                    setVariantFiles({ ...variantFiles, [`variant_image_${i}`]: file });
-                  }}
-                  className="text-xs"
-                />
-                <button type="button" onClick={() => removeVariant(i)} className="btn-ghost text-red-500">×</button>
-              </div>
-            ))}
+            {variants.map((v, i) => {
+              const hex = v.hex || '#e89bb0';
+              return (
+                <div key={i} className="flex flex-wrap items-center gap-3 p-3 bg-wrap-blush/40 rounded-2xl">
+                  <div
+                    className="w-10 h-10 rounded-full border-2 border-white shadow-soft flex-shrink-0"
+                    style={{ background: hex }}
+                    title={`Preview: ${v.color || 'unnamed'} (${hex})`}
+                  />
+                  <input
+                    value={v.color}
+                    onChange={e => updateVariant(i, 'color', e.target.value)}
+                    placeholder="Color name (e.g. Rose Pink)"
+                    className="input flex-1 min-w-[140px]"
+                  />
+                  <input
+                    type="color"
+                    value={hex}
+                    onChange={e => updateVariant(i, 'hex', e.target.value)}
+                    className="w-12 h-10 rounded-lg border border-wrap-pink/40 cursor-pointer bg-white"
+                    title="Pick color"
+                  />
+                  <input
+                    type="number"
+                    value={v.price_add}
+                    onChange={e => updateVariant(i, 'price_add', Number(e.target.value))}
+                    placeholder="+Rs."
+                    className="input w-28"
+                  />
+                  {v.image && (
+                    <img src={thumbUrl(v.image)} alt="" loading="lazy" decoding="async" width="48" height="48" className="w-12 h-12 rounded-xl object-cover" />
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={e => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setVariantFiles({ ...variantFiles, [`variant_image_${i}`]: file });
+                    }}
+                    className="text-xs"
+                  />
+                  <button type="button" onClick={() => removeVariant(i)} className="btn-ghost text-red-500">×</button>
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
