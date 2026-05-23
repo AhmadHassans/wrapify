@@ -13,9 +13,20 @@ export default function Cart({ open, onClose }) {
         onClick={onClose}
       />
       <aside className={`fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white z-50 shadow-2xl transform transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${open ? 'translate-x-0' : 'translate-x-full'}`}>
-        <div className="flex items-center justify-between p-5 border-b border-wrap-blush">
+        <div className="flex items-center justify-between p-5 border-b border-wrap-blush gap-3">
           <h3 className="font-display text-xl">Your Hamper 🛍️</h3>
-          <button onClick={onClose} className="btn-ghost">✕</button>
+          <div className="flex items-center gap-3 ml-auto">
+            <button
+              type="button"
+              onClick={() => { if (itemCount === 0) return; onClose(); nav('/build?step=6'); }}
+              disabled={itemCount === 0}
+              className="font-display text-sm text-wrap-rose hover:text-wrap-plum hover:underline disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center gap-1"
+            >
+              Checkout
+              <span className="text-base leading-none">→</span>
+            </button>
+            <button onClick={onClose} className="btn-ghost" aria-label="Close cart">✕</button>
+          </div>
         </div>
         <div className="p-5 overflow-y-auto h-[calc(100%-180px)]">
           {items.length === 0 ? (

@@ -24,8 +24,7 @@ const TRUST = [
   '✨ Handcrafted with love',
   '💌 Personalized notes',
   '🎀 Eid-ready packaging',
-  '💖 Custom themes',
-  '⚡ Same-day dispatch'
+  '💖 Custom themes'
 ];
 
 export default function HomePage() {
@@ -58,9 +57,6 @@ export default function HomePage() {
         <SparkleField />
 
         <div className="relative max-w-6xl mx-auto px-5 md:px-8 pt-20 pb-28 md:pt-32 md:pb-40 text-center z-10">
-          <span className="chip bg-white/70 text-wrap-rose mb-6 backdrop-blur-md border border-wrap-rose/20 shadow-soft animate-fadeIn">
-            ✦ Orders open for Lahore — for Eid orders
-          </span>
           <h1 className="font-display text-5xl md:text-7xl leading-[1.05] animate-fadeUp">
             <span className="text-gradient">Build Your Own</span>
             <br />

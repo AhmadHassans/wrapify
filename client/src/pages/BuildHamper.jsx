@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import ProductCard from '../components/ProductCard.jsx';
@@ -27,7 +27,9 @@ const PACK_META = {
 
 export default function BuildHamper() {
   const nav = useNavigate();
-  const [step, setStep] = useState(1);
+  const [searchParams] = useSearchParams();
+  const initialStep = Math.min(Math.max(parseInt(searchParams.get('step'), 10) || 1, 1), STEPS.length);
+  const [step, setStep] = useState(initialStep);
   const [products, setProducts] = useState([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
