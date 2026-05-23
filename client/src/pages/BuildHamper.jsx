@@ -305,10 +305,56 @@ export default function BuildHamper() {
                 </p>
               </div>
               <div className="card p-4 mt-4 bg-wrap-blush">
-                <div className="flex justify-between"><span>Items</span><span>Rs.{cart.itemsTotal}</span></div>
-                {packaging && <div className="flex justify-between"><span>{packaging.name}</span><span>Rs.{cart.packagingTotal}</span></div>}
-                {addons.length > 0 && <div className="flex justify-between"><span>Add-ons</span><span>Rs.{cart.addonsTotal}</span></div>}
-                <div className="border-t border-wrap-pink/30 mt-2 pt-2 flex justify-between font-display text-xl">
+                <div className="font-display text-lg mb-2">Order Summary 🛍️</div>
+
+                {items.length === 0 ? (
+                  <div className="text-sm text-wrap-plum/60 italic py-2">No items in hamper yet.</div>
+                ) : (
+                  <ul className="space-y-2 mb-3">
+                    {items.map(it => {
+                      const unit = (it.price || 0) + (it.variantPriceAdd || 0);
+                      const line = unit * it.qty;
+                      return (
+                        <li key={`${it.id}:${it.variant || ''}:${it.size || ''}`} className="flex gap-3 items-start text-sm">
+                          {it.image && (
+                            <img src={thumbUrl(it.image)} alt="" loading="lazy" decoding="async" width="48" height="48" className="w-12 h-12 rounded-xl object-cover bg-white flex-shrink-0" />
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-wrap-plum truncate">{it.name}</div>
+                            {(it.size || it.variant) && (
+                              <div className="text-xs text-wrap-plum/60">
+                                {[it.size, it.variant].filter(Boolean).join(' · ')}
+                              </div>
+                            )}
+                            <div className="text-xs text-wrap-plum/60">Rs.{unit} × {it.qty}</div>
+                          </div>
+                          <div className="font-display text-wrap-plum flex-shrink-0">Rs.{line}</div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+
+                {packaging && (
+                  <div className="flex justify-between text-sm pt-2 border-t border-wrap-pink/30">
+                    <span>📦 {packaging.name}</span>
+                    <span>Rs.{cart.packagingTotal}</span>
+                  </div>
+                )}
+
+                {addons.length > 0 && (
+                  <div className="pt-2 border-t border-wrap-pink/30 mt-2 space-y-1">
+                    <div className="text-sm font-medium">✨ Add-ons</div>
+                    {addons.map(a => (
+                      <div key={a.id} className="flex justify-between text-sm">
+                        <span>{a.name} × {a.qty || 1}</span>
+                        <span>Rs.{(a.price || 0) * (a.qty || 1)}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="border-t border-wrap-pink/30 mt-3 pt-2 flex justify-between font-display text-xl">
                   <span>Total</span><span>Rs.{total}</span>
                 </div>
               </div>
