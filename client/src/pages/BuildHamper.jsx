@@ -32,7 +32,7 @@ export default function BuildHamper() {
   const [cartOpen, setCartOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [orderResult, setOrderResult] = useState(null);
-  const [form, setForm] = useState({ customer_name: '', address: '', phone: '', payment_method: 'COD' });
+  const [form, setForm] = useState({ customer_name: '', address: '', phone: '', payment_method: 'jazzcash' });
   const [paymentStatus, setPaymentStatus] = useState({ jazzcash: false, easypaisa: false });
 
   useEffect(() => {
@@ -154,7 +154,7 @@ export default function BuildHamper() {
       <Cart open={cartOpen} onClose={() => setCartOpen(false)} />
 
       <div className="max-w-5xl mx-auto px-5 md:px-8 pt-8">
-        <StepDots step={step} />
+        <StepDots step={step} onStepClick={setStep} />
 
         {step === 1 && (
           <div className="mt-10 text-center animate-fadeUp">
@@ -297,24 +297,16 @@ export default function BuildHamper() {
               <div>
                 <label className="text-sm text-wrap-plum/70 mb-2 block">Payment Method</label>
                 <div className="grid grid-cols-2 gap-2">
-                  <PayBtn active={form.payment_method === 'COD'} onClick={() => setForm({ ...form, payment_method: 'COD' })}>
-                    💵 Cash on Delivery
-                  </PayBtn>
                   <PayBtn active={form.payment_method === 'jazzcash'} onClick={() => setForm({ ...form, payment_method: 'jazzcash' })}>
                     📱 JazzCash
                   </PayBtn>
                   <PayBtn active={form.payment_method === 'easypaisa'} onClick={() => setForm({ ...form, payment_method: 'easypaisa' })}>
                     💚 EasyPaisa
                   </PayBtn>
-                  <PayBtn active={form.payment_method === 'Bank Transfer'} onClick={() => setForm({ ...form, payment_method: 'Bank Transfer' })}>
-                    🏦 Bank Transfer
-                  </PayBtn>
                 </div>
-                {(form.payment_method !== 'COD') && (
-                  <p className="text-xs text-wrap-plum/60 mt-2">
-                    After placing order, you'll see account details to pay manually and upload a receipt screenshot for verification.
-                  </p>
-                )}
+                <p className="text-xs text-wrap-plum/60 mt-2">
+                  After placing order, you'll see account details to pay manually and upload a receipt screenshot for verification.
+                </p>
               </div>
               <div className="card p-4 mt-4 bg-wrap-blush">
                 <div className="flex justify-between"><span>Items</span><span>Rs.{cart.itemsTotal}</span></div>
@@ -349,24 +341,33 @@ export default function BuildHamper() {
   );
 }
 
-function StepDots({ step }) {
+function StepDots({ step, onStepClick }) {
   return (
     <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-2">
-      {STEPS.map(s => (
-        <div
-          key={s.id}
-          className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-all duration-500 ${
-            step >= s.id
-              ? 'bg-gradient-to-r from-wrap-pink to-wrap-rose text-white shadow-soft'
-              : 'bg-wrap-blush/60 text-wrap-plum/60'
-          } ${step === s.id ? 'scale-110' : ''}`}
-        >
-          <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${step >= s.id ? 'bg-white/30' : 'bg-white'}`}>
-            {step > s.id ? '✓' : s.id}
-          </span>
-          {s.label}
-        </div>
-      ))}
+      {STEPS.map(s => {
+        const isCompleted = step > s.id;
+        const isCurrent = step === s.id;
+        const clickable = isCompleted;
+        return (
+          <button
+            key={s.id}
+            type="button"
+            onClick={clickable ? () => onStepClick(s.id) : undefined}
+            disabled={!clickable}
+            aria-label={clickable ? `Go back to ${s.label}` : s.label}
+            className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm whitespace-nowrap transition-all duration-500 ${
+              step >= s.id
+                ? 'bg-gradient-to-r from-wrap-pink to-wrap-rose text-white shadow-soft'
+                : 'bg-wrap-blush/60 text-wrap-plum/60'
+            } ${isCurrent ? 'scale-110' : ''} ${clickable ? 'cursor-pointer hover:scale-105 hover:shadow-pop' : 'cursor-default'}`}
+          >
+            <span className={`w-5 h-5 rounded-full flex items-center justify-center text-xs font-bold ${step >= s.id ? 'bg-white/30' : 'bg-white'}`}>
+              {isCompleted ? '✓' : s.id}
+            </span>
+            {s.label}
+          </button>
+        );
+      })}
     </div>
   );
 }

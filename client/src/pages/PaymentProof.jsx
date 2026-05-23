@@ -8,16 +8,13 @@ import { useCart } from '../context/CartContext.jsx';
 
 const METHODS = {
   jazzcash: { label: 'JazzCash', emoji: '📱', accent: 'from-red-400 to-orange-400' },
-  easypaisa: { label: 'EasyPaisa', emoji: '💚', accent: 'from-emerald-500 to-green-400' },
-  bank: { label: 'Bank Transfer', emoji: '🏦', accent: 'from-blue-500 to-indigo-500' }
+  easypaisa: { label: 'EasyPaisa', emoji: '💚', accent: 'from-emerald-500 to-green-400' }
 };
 
 const methodKey = (paymentMethod) => {
   const m = (paymentMethod || '').toLowerCase();
-  if (m.includes('jazz')) return 'jazzcash';
   if (m.includes('easy')) return 'easypaisa';
-  if (m.includes('bank')) return 'bank';
-  return 'bank';
+  return 'jazzcash';
 };
 
 export default function PaymentProof() {
@@ -176,18 +173,7 @@ export default function PaymentProof() {
             {acc ? (
               <div className="space-y-2">
                 <AccountRow label="Account Title" value={acc.title} onCopy={copy} />
-                {key === 'bank' && acc.bank && (
-                  <AccountRow label="Bank" value={acc.bank} onCopy={copy} />
-                )}
-                {key === 'bank' && acc.iban && (
-                  <AccountRow label="IBAN" value={acc.iban} onCopy={copy} mono />
-                )}
-                {(key === 'bank' && acc.account) && (
-                  <AccountRow label="Account #" value={acc.account} onCopy={copy} mono />
-                )}
-                {(key !== 'bank') && (
-                  <AccountRow label="Mobile Number" value={acc.number} onCopy={copy} mono />
-                )}
+                <AccountRow label="Mobile Number" value={acc.number} onCopy={copy} mono />
                 <AccountRow label="Amount" value={`Rs.${order.total_price}`} onCopy={() => copy(String(order.total_price))} highlight />
                 <p className="text-xs text-wrap-plum/60 mt-3 italic">{acc.instructions}</p>
               </div>
@@ -205,11 +191,11 @@ export default function PaymentProof() {
               <p className="text-sm text-wrap-plum/70">After paying, fill below so we can verify quickly.</p>
             </div>
 
-            <Field label={key === 'bank' ? 'Sender Name / Account Title' : 'Sender Mobile Number / Name'}>
+            <Field label="Sender Mobile Number / Name">
               <input
                 value={senderDetails}
                 onChange={e => setSenderDetails(e.target.value)}
-                placeholder={key === 'bank' ? 'e.g. Ahmad Hassan' : 'e.g. 03001234567'}
+                placeholder="e.g. 03001234567"
                 className="input"
                 required
               />

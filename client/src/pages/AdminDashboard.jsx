@@ -271,7 +271,7 @@ function OrdersTable({ orders, reload }) {
                         </div>
                         <div>
                           <div className="font-medium mb-1">Payment Proof</div>
-                          {o.payment_method && o.payment_method !== 'COD' ? (
+                          {o.payment_method ? (
                             <div className="space-y-1">
                               <div><span className="font-medium">Method: </span>{o.payment_method}</div>
                               {o.sender_details && <div><span className="font-medium">Sender: </span>{o.sender_details}</div>}
@@ -286,7 +286,7 @@ function OrdersTable({ orders, reload }) {
                               )}
                             </div>
                           ) : (
-                            <div className="text-wrap-plum/60 italic">{o.payment_method === 'COD' ? 'Cash on Delivery' : '—'}</div>
+                            <div className="text-wrap-plum/60 italic">—</div>
                           )}
                         </div>
                       </div>

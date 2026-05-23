@@ -72,7 +72,7 @@ const computeTotal = ({ items = [], packaging, addons = [] }) => {
 
 const needsVerification = (method) => {
   const m = (method || '').toLowerCase();
-  return ['jazzcash', 'easypaisa', 'bank transfer', 'bank'].includes(m);
+  return ['jazzcash', 'easypaisa'].includes(m);
 };
 
 router.post('/', (req, res) => {

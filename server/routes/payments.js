@@ -19,20 +19,13 @@ router.get('/accounts', (req, res) => {
   res.json({
     jazzcash: {
       title: process.env.ACCOUNT_JAZZCASH_NAME || 'Wrapify',
-      number: process.env.ACCOUNT_JAZZCASH_NUMBER || '03XX-XXXXXXX',
+      number: process.env.ACCOUNT_JAZZCASH_NUMBER || '03236313345',
       instructions: 'Send the exact total amount to this JazzCash mobile account. After paying, enter the TRX ID and upload screenshot.'
     },
     easypaisa: {
       title: process.env.ACCOUNT_EASYPAISA_NAME || 'Wrapify',
-      number: process.env.ACCOUNT_EASYPAISA_NUMBER || '03XX-XXXXXXX',
+      number: process.env.ACCOUNT_EASYPAISA_NUMBER || '03236313345',
       instructions: 'Send the exact total amount to this EasyPaisa mobile account. After paying, enter the TRX ID and upload screenshot.'
-    },
-    bank: {
-      title: process.env.ACCOUNT_BANK_TITLE || 'Wrapify',
-      bank: process.env.ACCOUNT_BANK_NAME || 'Meezan Bank',
-      iban: process.env.ACCOUNT_BANK_IBAN || 'PK00MEZN0000000000000000',
-      account: process.env.ACCOUNT_BANK_NUMBER || '00000000000000',
-      instructions: 'Transfer the exact total amount to this bank account. After transfer, enter the reference and upload receipt.'
     }
   });
 });
@@ -47,7 +40,7 @@ router.post('/initiate/:orderId', (req, res) => {
   try {
     if (method === 'jazzcash') {
       if (!jazzcash.isConfigured()) {
-        return res.status(503).json({ error: 'JazzCash not configured yet. Use COD or contact support.' });
+        return res.status(503).json({ error: 'JazzCash not configured yet. Please contact support on WhatsApp.' });
       }
       const { url, fields } = jazzcash.buildFormData({
         orderId: order.id,
@@ -60,7 +53,7 @@ router.post('/initiate/:orderId', (req, res) => {
 
     if (method === 'easypaisa') {
       if (!easypaisa.isConfigured()) {
-        return res.status(503).json({ error: 'EasyPaisa not configured yet. Use COD or contact support.' });
+        return res.status(503).json({ error: 'EasyPaisa not configured yet. Please contact support on WhatsApp.' });
       }
       const { url, fields } = easypaisa.buildFormData({
         orderId: order.id,
@@ -71,7 +64,7 @@ router.post('/initiate/:orderId', (req, res) => {
       return res.json({ provider: 'easypaisa', method: 'POST', url, fields });
     }
 
-    res.json({ provider: 'cod', method: null });
+    return res.status(400).json({ error: `Unsupported payment method: ${order.payment_method}` });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
