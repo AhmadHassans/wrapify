@@ -70,7 +70,7 @@ export default function ChatWidget() {
       </button>
 
       {open && (
-        <div className="fixed bottom-24 right-5 z-50 w-[360px] max-w-[calc(100vw-2.5rem)] h-[520px] max-h-[calc(100vh-8rem)] bg-white rounded-3xl shadow-pop border border-wrap-rose/15 flex flex-col overflow-hidden animate-fadeUp">
+        <div className="fixed bottom-24 right-5 z-50 w-[360px] max-w-[calc(100vw-2.5rem)] h-[520px] max-h-[calc(100dvh-8rem)] bg-white rounded-3xl shadow-pop border border-wrap-rose/15 flex flex-col overflow-hidden animate-fadeUp">
           <div className="px-5 py-4 border-b border-wrap-rose/10 flex items-center justify-between" style={{ background: 'linear-gradient(135deg, #F5D9E2 0%, #FBF1F0 100%)' }}>
             <div>
               <div className="font-display text-lg text-wrap-plum">Wrapify Assistant ✨</div>
@@ -118,20 +118,20 @@ export default function ChatWidget() {
             )}
           </div>
 
-          <div className="p-3 border-t border-wrap-rose/10 bg-white">
-            <div className="flex gap-2">
+          <div className="p-3 border-t border-wrap-rose/10 bg-white flex-shrink-0" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom))' }}>
+            <div className="flex gap-2 items-center">
               <input
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), send())}
                 placeholder="Type your budget or question…"
                 disabled={loading}
-                className="flex-1 px-4 py-2 rounded-pill border border-wrap-rose/30 text-sm focus:outline-none focus:border-wrap-rose bg-wrap-cream"
+                className="flex-1 min-w-0 px-4 py-2 rounded-pill border border-wrap-rose/30 text-sm focus:outline-none focus:border-wrap-rose bg-wrap-cream"
               />
               <button
                 onClick={send}
                 disabled={loading || !input.trim()}
-                className="btn-primary px-4 py-2 text-sm disabled:opacity-40"
+                className="btn-primary px-4 py-2 text-sm disabled:opacity-40 flex-shrink-0"
               >
                 Send
               </button>

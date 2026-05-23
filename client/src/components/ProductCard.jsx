@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { imgUrl } from '../lib/api.js';
+import { imgUrl, thumbUrl } from '../lib/api.js';
 import { useCart } from '../context/CartContext.jsx';
 
 const labelClass = (label) => {
@@ -26,20 +26,29 @@ export default function ProductCard({ product, compact = false }) {
   const [bursting, setBursting] = useState(false);
 
   const hasVariants = product.variants && product.variants.length > 0;
+  const hasSizes = product.sizes && product.sizes.length > 0;
   const selectedVariant = hasVariants ? product.variants[variantIdx] : null;
+  const defaultSize = hasSizes ? product.sizes[0] : null;
   const displayImage = useMemo(() => {
     if (selectedVariant?.image) return selectedVariant.image;
     return product.images?.[imgIdx] || product.images?.[0] || '';
   }, [selectedVariant, product.images, imgIdx]);
 
   const priceDisplay = useMemo(() => {
+    if (hasSizes) {
+      const prices = product.sizes.map(s => Number(s.price) || 0);
+      const min = Math.min(...prices);
+      const max = Math.max(...prices);
+      if (min === max) return `Rs.${min}`;
+      return `Rs.${min} – Rs.${max}`;
+    }
     return `Rs.${Number(product.price) + (selectedVariant?.price_add || 0)}`;
-  }, [product, selectedVariant]);
+  }, [hasSizes, product, selectedVariant]);
 
   const handleAdd = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    addItem(product, selectedVariant, 1);
+    addItem(product, selectedVariant, defaultSize, 1);
     setAdded(true);
     setBursting(true);
     setTimeout(() => setBursting(false), 700);
@@ -64,10 +73,15 @@ export default function ProductCard({ product, compact = false }) {
         <div className="relative aspect-square bg-gradient-to-br from-wrap-blush to-wrap-cream overflow-hidden">
           {displayImage && (
             <img
-              src={imgUrl(displayImage)}
+              src={thumbUrl(displayImage)}
+              srcSet={`${thumbUrl(displayImage)} 400w, ${imgUrl(displayImage)} 1200w`}
+              sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
               alt={product.name}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
               loading="lazy"
+              decoding="async"
+              width="400"
+              height="400"
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
             />
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -122,6 +136,12 @@ export default function ProductCard({ product, compact = false }) {
                   className={`w-7 h-7 rounded-full border-2 transition-all duration-300 ${i === variantIdx ? 'border-wrap-rose scale-110 shadow-pop' : 'border-white shadow-soft hover:scale-105'}`}
                 />
               ))}
+            </div>
+          )}
+
+          {hasSizes && (
+            <div className="mt-2 text-xs text-wrap-plum/60">
+              {product.sizes.length} size{product.sizes.length === 1 ? '' : 's'} available
             </div>
           )}
 

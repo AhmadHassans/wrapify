@@ -5,7 +5,7 @@ import Footer from '../components/Footer.jsx';
 import ProductCard from '../components/ProductCard.jsx';
 import Cart from '../components/Cart.jsx';
 import Reveal from '../components/Reveal.jsx';
-import { api, imgUrl } from '../lib/api.js';
+import { api, imgUrl, thumbUrl } from '../lib/api.js';
 import { useCart } from '../context/CartContext.jsx';
 
 const swatchHex = (name) => {
@@ -28,12 +28,13 @@ export default function ProductDetail() {
 
   const [imgIdx, setImgIdx] = useState(0);
   const [variantIdx, setVariantIdx] = useState(0);
+  const [sizeIdx, setSizeIdx] = useState(0);
   const [qty, setQty] = useState(1);
   const [added, setAdded] = useState(false);
 
   useEffect(() => {
     setLoading(true);
-    setImgIdx(0); setVariantIdx(0); setQty(1);
+    setImgIdx(0); setVariantIdx(0); setSizeIdx(0); setQty(1);
     api.get(`/api/products/${id}`)
       .then(setProduct)
       .catch(() => setProduct(null))
@@ -42,6 +43,7 @@ export default function ProductDetail() {
   }, [id]);
 
   const variant = product?.variants?.[variantIdx] || null;
+  const size = product?.sizes?.[sizeIdx] || null;
   const displayImage = useMemo(() => {
     if (variant?.image) return variant.image;
     return product?.images?.[imgIdx] || product?.images?.[0] || '';
@@ -49,21 +51,21 @@ export default function ProductDetail() {
 
   const unitPrice = useMemo(() => {
     if (!product) return 0;
-    const base = Number(product.price) || 0;
+    const base = size ? Number(size.price) : Number(product.price) || 0;
     const add = variant ? Number(variant.price_add) || 0 : 0;
     return base + add;
-  }, [product, variant]);
+  }, [product, size, variant]);
 
   const handleAdd = () => {
     if (!product) return;
-    addItem(product, variant, qty);
+    addItem(product, variant, size, qty);
     setAdded(true);
     setTimeout(() => setAdded(false), 1500);
   };
 
   const buyNow = () => {
     if (!product) return;
-    addItem(product, variant, qty);
+    addItem(product, variant, size, qty);
     nav('/build');
   };
 
@@ -118,7 +120,15 @@ export default function ProductDetail() {
             <div className="space-y-4">
               <div className="relative aspect-square bg-gradient-to-br from-wrap-blush to-wrap-cream rounded-3xl overflow-hidden shadow-soft">
                 {displayImage && (
-                  <img src={imgUrl(displayImage)} alt={product.name} className="w-full h-full object-cover animate-fadeIn" />
+                  <img
+                    src={imgUrl(displayImage)}
+                    alt={product.name}
+                    decoding="async"
+                    fetchpriority="high"
+                    width="1200"
+                    height="1200"
+                    className="w-full h-full object-cover animate-fadeIn"
+                  />
                 )}
                 {product.deals && (
                   <span className="absolute top-4 left-4 chip bg-gradient-to-r from-wrap-pink to-wrap-rose text-white shadow-pop font-semibold animate-pulseSoft">
@@ -134,7 +144,7 @@ export default function ProductDetail() {
                       onClick={() => setImgIdx(i)}
                       className={`w-20 h-20 rounded-2xl overflow-hidden flex-shrink-0 border-2 transition-all ${i === imgIdx ? 'border-wrap-rose shadow-pop scale-105' : 'border-transparent opacity-70 hover:opacity-100'}`}
                     >
-                      <img src={imgUrl(img)} className="w-full h-full object-cover" />
+                      <img src={thumbUrl(img)} alt="" loading="lazy" decoding="async" width="80" height="80" className="w-full h-full object-cover" />
                     </button>
                   ))}
                 </div>
@@ -154,6 +164,24 @@ export default function ProductDetail() {
                 Rs.{unitPrice}
               </div>
               <p className="text-wrap-plum/75 mb-6 leading-relaxed">{product.description}</p>
+
+              {product.sizes && product.sizes.length > 0 && (
+                <div className="mb-5">
+                  <div className="text-sm font-medium text-wrap-plum mb-2">Size</div>
+                  <div className="flex flex-wrap gap-2">
+                    {product.sizes.map((s, i) => (
+                      <button
+                        key={i}
+                        onClick={() => setSizeIdx(i)}
+                        className={`px-4 py-2 rounded-pill border-2 text-sm transition-all ${i === sizeIdx ? 'border-wrap-rose bg-wrap-rose text-white shadow-soft' : 'border-wrap-pink/40 bg-white text-wrap-plum hover:border-wrap-rose'}`}
+                      >
+                        <span className="font-medium">{s.name}</span>
+                        <span className={`ml-2 text-xs ${i === sizeIdx ? 'opacity-90' : 'opacity-70'}`}>Rs.{s.price}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {product.variants && product.variants.length > 0 && (
                 <div className="mb-5">

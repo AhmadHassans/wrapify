@@ -22,8 +22,16 @@ app.use(cors({ origin: corsOrigin === '*' ? true : corsOrigin.split(',') }));
 app.use(express.json({ limit: '2mb' }));
 
 app.use('/api/uploads', express.static(uploadsDir, {
-  maxAge: '7d',
-  setHeaders: (res) => res.set('Cross-Origin-Resource-Policy', 'cross-origin')
+  maxAge: '365d',
+  immutable: true,
+  setHeaders: (res, filePath) => {
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+    if (/seed_/.test(filePath)) {
+      res.set('Cache-Control', 'public, max-age=604800');
+    } else {
+      res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+  }
 }));
 app.use('/api/receipts', express.static(path.join(uploadsDir, 'receipts'), {
   maxAge: '7d',

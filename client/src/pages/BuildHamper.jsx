@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import ProductCard from '../components/ProductCard.jsx';
 import Cart from '../components/Cart.jsx';
-import { api, imgUrl } from '../lib/api.js';
+import { api, imgUrl, thumbUrl } from '../lib/api.js';
 import { useCart } from '../context/CartContext.jsx';
 
 const STEPS = [
@@ -71,7 +71,7 @@ export default function BuildHamper() {
         address: form.address,
         phone: form.phone,
         payment_method: form.payment_method,
-        items: items.map(i => ({ id: i.id, qty: i.qty, variant: i.variant })),
+        items: items.map(i => ({ id: i.id, qty: i.qty, variant: i.variant, size: i.size })),
         packaging: packaging ? { id: packaging.id, name: packaging.name } : null,
         addons: addons.map(a => ({ id: a.id, qty: a.qty || 1 })),
         notes,
@@ -107,7 +107,7 @@ export default function BuildHamper() {
       'Items:'
     ];
     items.forEach(it => {
-      lines.push(`• ${it.name}${it.variant ? ` (${it.variant})` : ''} x${it.qty} — Rs.${(it.price + (it.variantPriceAdd || 0)) * it.qty}`);
+      lines.push(`• ${it.name}${it.size ? ` [${it.size}]` : ''}${it.variant ? ` (${it.variant})` : ''} x${it.qty} — Rs.${(it.price + (it.variantPriceAdd || 0)) * it.qty}`);
     });
     if (packaging) lines.push('', `Packaging: ${packaging.name} — Rs.${packaging.price}`);
     if (addons.length) {
@@ -195,15 +195,30 @@ export default function BuildHamper() {
           <div className="mt-10 animate-fadeUp">
             <h2 className="font-display text-3xl md:text-4xl">Pick your goodies 🛍️</h2>
             <p className="text-wrap-plum/70 mt-1">Tap to add. Your hamper updates live.</p>
-            <div className="mt-6 grid grid-cols-2 md:grid-cols-3 gap-5">
-              {items_for_purchase.map(p => <ProductCard key={p.id} product={p} />)}
-            </div>
+            {items_for_purchase.length === 0 ? (
+              <div className="mt-10 card p-10 text-center text-wrap-plum/60">
+                <div className="text-4xl mb-2">🌸</div>
+                <div className="font-display text-lg">No items available yet.</div>
+                <div className="text-sm mt-1">Admin can add products from the Admin panel.</div>
+              </div>
+            ) : (
+              <div className="mt-6 grid grid-cols-2 md:grid-cols-3 gap-5">
+                {items_for_purchase.map(p => <ProductCard key={p.id} product={p} />)}
+              </div>
+            )}
           </div>
         )}
 
         {step === 3 && (
           <div className="mt-10 animate-fadeUp">
             <h2 className="font-display text-3xl md:text-4xl">Choose packaging 📦</h2>
+            {packagingProducts.length === 0 && (
+              <div className="mt-10 card p-10 text-center text-wrap-plum/60">
+                <div className="text-4xl mb-2">📦</div>
+                <div className="font-display text-lg">No packaging options yet.</div>
+                <div className="text-sm mt-1">Admin can add packaging from the Admin panel.</div>
+              </div>
+            )}
             <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
               {packagingProducts.map(p => {
                 const meta = PACK_META[p.packaging_type] || { name: p.name, emoji: '📦' };
@@ -215,7 +230,7 @@ export default function BuildHamper() {
                     className={`card p-5 text-center transition ${selected ? 'ring-2 ring-wrap-pink' : ''}`}
                   >
                     <div className="text-4xl mb-2">{meta.emoji}</div>
-                    {p.images?.[0] && <img src={imgUrl(p.images[0])} className="w-full h-28 object-cover rounded-2xl mb-2" />}
+                    {p.images?.[0] && <img src={thumbUrl(p.images[0])} alt="" loading="lazy" decoding="async" width="400" height="280" className="w-full h-28 object-cover rounded-2xl mb-2" />}
                     <div className="font-display">{meta.name}</div>
                     <div className="text-wrap-plum/70 text-sm">Rs.{p.price}</div>
                   </button>
@@ -229,6 +244,13 @@ export default function BuildHamper() {
           <div className="mt-10 animate-fadeUp">
             <h2 className="font-display text-3xl md:text-4xl">Add-ons ✨</h2>
             <p className="text-wrap-plum/70 mt-1">Optional. Add a card, note, or surprise.</p>
+            {addonProducts.length === 0 && (
+              <div className="mt-10 card p-10 text-center text-wrap-plum/60">
+                <div className="text-4xl mb-2">✨</div>
+                <div className="font-display text-lg">No add-ons available yet.</div>
+                <div className="text-sm mt-1">You can skip this step.</div>
+              </div>
+            )}
             <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
               {addonProducts.map(p => {
                 const selected = addons.some(a => a.id === p.id);
@@ -238,7 +260,7 @@ export default function BuildHamper() {
                     onClick={() => toggleAddon(p)}
                     className={`card p-4 text-left transition ${selected ? 'ring-2 ring-wrap-pink' : ''}`}
                   >
-                    {p.images?.[0] && <img src={imgUrl(p.images[0])} className="w-full h-28 object-cover rounded-2xl mb-2" />}
+                    {p.images?.[0] && <img src={thumbUrl(p.images[0])} alt="" loading="lazy" decoding="async" width="400" height="280" className="w-full h-28 object-cover rounded-2xl mb-2" />}
                     <div className="font-display">{p.name}</div>
                     <div className="flex justify-between items-center mt-1">
                       <span className="text-wrap-plum/70 text-sm">Rs.{p.price}</span>

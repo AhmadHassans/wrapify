@@ -1,5 +1,12 @@
 export const imgUrl = (filename) => filename ? `/api/uploads/${filename}` : '';
 
+export const thumbUrl = (filename) => {
+  if (!filename) return '';
+  if (filename.endsWith('_thumb.webp')) return `/api/uploads/${filename}`;
+  if (filename.endsWith('.webp')) return `/api/uploads/${filename.replace(/\.webp$/, '_thumb.webp')}`;
+  return `/api/uploads/${filename}`;
+};
+
 export const api = {
   async get(path) {
     const res = await fetch(path);

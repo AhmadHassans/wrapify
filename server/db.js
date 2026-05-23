@@ -18,9 +18,7 @@ try {
   state.orders ||= [];
   state.nextProductId ||= 1;
   state.nextOrderId ||= 1;
-  let migrated = 0;
-  state.products.forEach(p => { if ('sizes' in p) { delete p.sizes; migrated++; } });
-  if (migrated) console.log('[db] migration: removed sizes field from', migrated, 'products');
+  state.products.forEach(p => { if (!Array.isArray(p.sizes)) p.sizes = []; });
 } catch {
   state = JSON.parse(JSON.stringify(initial));
 }
@@ -235,6 +233,7 @@ const products = {
       is_addon: obj.is_addon ? 1 : 0,
       images: Array.isArray(obj.images) ? obj.images : [],
       variants: Array.isArray(obj.variants) ? obj.variants : [],
+      sizes: Array.isArray(obj.sizes) ? obj.sizes : [],
       deals: obj.deals || '',
       is_active: obj.is_active === 0 ? 0 : 1,
       created_at: nowStamp()

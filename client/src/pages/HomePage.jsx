@@ -5,7 +5,7 @@ import Footer from '../components/Footer.jsx';
 import ProductCard from '../components/ProductCard.jsx';
 import Cart from '../components/Cart.jsx';
 import Reveal from '../components/Reveal.jsx';
-import { api, imgUrl } from '../lib/api.js';
+import { api, imgUrl, thumbUrl } from '../lib/api.js';
 
 const STEPS = [
   { icon: '🎯', title: 'Set Your Budget', desc: 'Tell us how much you want to spend.', to: '/build' },
@@ -59,7 +59,7 @@ export default function HomePage() {
 
         <div className="relative max-w-6xl mx-auto px-5 md:px-8 pt-20 pb-28 md:pt-32 md:pb-40 text-center z-10">
           <span className="chip bg-white/70 text-wrap-rose mb-6 backdrop-blur-md border border-wrap-rose/20 shadow-soft animate-fadeIn">
-            ✦ Orders open till 20th | Limited slots
+            ✦ Orders open for Lahore — for Eid orders
           </span>
           <h1 className="font-display text-5xl md:text-7xl leading-[1.05] animate-fadeUp">
             <span className="text-gradient">Build Your Own</span>
@@ -167,7 +167,7 @@ export default function HomePage() {
                   <div className="text-5xl mb-2 inline-block group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">{meta.emoji}</div>
                   {p.images?.[0] && (
                     <div className="overflow-hidden rounded-2xl mb-3">
-                      <img src={imgUrl(p.images[0])} className="w-full h-32 object-cover group-hover:scale-110 transition-transform duration-500" />
+                      <img src={thumbUrl(p.images[0])} alt={meta.name} loading="lazy" decoding="async" width="400" height="320" className="w-full h-32 object-cover group-hover:scale-110 transition-transform duration-500" />
                     </div>
                   )}
                   <div className="font-display text-lg">{meta.name}</div>

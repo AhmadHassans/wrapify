@@ -5,6 +5,7 @@ const fs = require('fs');
 const crypto = require('crypto');
 
 const db = require('../db');
+const { processFiles } = require('../imagePipeline');
 
 const router = express.Router();
 
@@ -38,7 +39,8 @@ const formatProduct = (p) => ({
   is_addon: !!p.is_addon,
   is_active: !!p.is_active,
   images: Array.isArray(p.images) ? p.images : [],
-  variants: Array.isArray(p.variants) ? p.variants : []
+  variants: Array.isArray(p.variants) ? p.variants : [],
+  sizes: Array.isArray(p.sizes) ? p.sizes : []
 });
 
 router.get('/', (req, res) => {
@@ -61,7 +63,17 @@ const parseVariantsField = (raw) => {
   } catch { return []; }
 };
 
-router.post('/', upload.any(), (req, res) => {
+const parseSizesField = (raw) => {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+  try {
+    const v = JSON.parse(raw);
+    if (!Array.isArray(v)) return [];
+    return v.map(s => ({ name: String(s.name || ''), price: Number(s.price) || 0 })).filter(s => s.name);
+  } catch { return []; }
+};
+
+router.post('/', upload.any(), async (req, res) => {
   const {
     name, description = '', price = 0,
     label = '', packaging_type = '',
@@ -70,6 +82,7 @@ router.post('/', upload.any(), (req, res) => {
 
   if (!name) return res.status(400).json({ error: 'name required' });
 
+  await processFiles(req.files || []);
   const allFiles = req.files || [];
   const imageFiles = allFiles.filter(f => f.fieldname === 'images').map(f => f.filename);
   let images = imageFiles;
@@ -90,6 +103,8 @@ router.post('/', upload.any(), (req, res) => {
     if (variantFileMap[key]) v.image = variantFileMap[key];
   });
 
+  const sizes = parseSizesField(req.body.sizes);
+
   const row = db.products.insert({
     name,
     description,
@@ -99,6 +114,7 @@ router.post('/', upload.any(), (req, res) => {
     is_addon: is_addon === '1' || is_addon === 1 || is_addon === true ? 1 : 0,
     images,
     variants,
+    sizes,
     deals,
     is_active: is_active === '0' || is_active === 0 ? 0 : 1
   });
@@ -106,11 +122,12 @@ router.post('/', upload.any(), (req, res) => {
   res.status(201).json(formatProduct(row));
 });
 
-router.put('/:id', upload.any(), (req, res) => {
+router.put('/:id', upload.any(), async (req, res) => {
   const existing = db.products.get(req.params.id);
   if (!existing) return res.status(404).json({ error: 'Not found' });
 
   const body = req.body;
+  await processFiles(req.files || []);
   const allFiles = req.files || [];
   const imageFiles = allFiles.filter(f => f.fieldname === 'images').map(f => f.filename);
   let images = Array.isArray(existing.images) ? existing.images : [];
@@ -136,6 +153,10 @@ router.put('/:id', upload.any(), (req, res) => {
     if (variantFileMap[key]) v.image = variantFileMap[key];
   });
 
+  const sizes = body.sizes !== undefined
+    ? parseSizesField(body.sizes)
+    : (Array.isArray(existing.sizes) ? existing.sizes : []);
+
   const patch = {
     name: body.name ?? existing.name,
     description: body.description ?? existing.description,
@@ -147,6 +168,7 @@ router.put('/:id', upload.any(), (req, res) => {
       : existing.is_addon,
     images,
     variants,
+    sizes,
     deals: body.deals ?? existing.deals,
     is_active: body.is_active !== undefined
       ? (body.is_active === '0' || body.is_active === 0 ? 0 : 1)
@@ -169,9 +191,10 @@ router.delete('/:id', (req, res) => {
   res.json({ success: true });
 });
 
-router.post('/:id/images', upload.array('images', 12), (req, res) => {
+router.post('/:id/images', upload.array('images', 12), async (req, res) => {
   const existing = db.products.get(req.params.id);
   if (!existing) return res.status(404).json({ error: 'Not found' });
+  await processFiles(req.files || []);
   const added = (req.files || []).map(f => f.filename);
   const all = [...(Array.isArray(existing.images) ? existing.images : []), ...added];
   const updated = db.products.update(existing.id, { images: all });
