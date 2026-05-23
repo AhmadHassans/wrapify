@@ -11,7 +11,6 @@ deployment:
     - /bin/cp -R $SRC/server/*.js $DEPLOYPATH/server/
     - /bin/cp -R $SRC/server/routes/*.js $DEPLOYPATH/server/routes/
     - /bin/cp -R $SRC/server/uploads/*.svg $DEPLOYPATH/server/uploads/ 2>/dev/null || true
-    - cd $SRC/client && NODE_ENV=development /home/wrapvrrz/nodevenv/wrapify/20/bin/npm install --include=dev && ./node_modules/.bin/vite build
     - /bin/cp -R $SRC/client/dist/* $DEPLOYPATH/client/dist/
     - /bin/cp -R $SRC/client/dist/* $PUBLICHTML/
     - /bin/cp $SRC/package.json $DEPLOYPATH/
