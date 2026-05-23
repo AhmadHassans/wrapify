@@ -216,26 +216,10 @@ export default function BuildHamper() {
                 <div className="text-sm mt-1">Admin can add packaging from the Admin panel.</div>
               </div>
             )}
-            <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-              {packagingProducts.map(p => {
-                const meta = PACK_META[p.packaging_type] || { name: p.name, emoji: '📦' };
-                const selected = packaging?.id === p.id;
-                return (
-                  <button
-                    key={p.id}
-                    onClick={() => setPackaging({ id: p.id, name: meta.name, price: p.price, type: p.packaging_type })}
-                    className={`card p-5 text-center transition flex flex-col ${selected ? 'ring-2 ring-wrap-pink' : ''}`}
-                  >
-                    <div className="text-4xl mb-2">{meta.emoji}</div>
-                    {p.images?.[0] && <img src={thumbUrl(p.images[0])} alt="" loading="lazy" decoding="async" width="400" height="280" className="w-full h-28 object-cover rounded-2xl mb-2" />}
-                    <div className="font-display">{meta.name}</div>
-                    {p.description && (
-                      <div className="text-xs text-wrap-plum/60 mt-1 leading-snug">{p.description}</div>
-                    )}
-                    <div className="text-wrap-rose font-semibold text-sm mt-2">Rs.{p.price}</div>
-                  </button>
-                );
-              })}
+            <div className="mt-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+              {packagingProducts.map(p => (
+                <ProductCard key={p.id} product={p} />
+              ))}
             </div>
           </div>
         )}
