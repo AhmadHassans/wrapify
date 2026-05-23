@@ -7,15 +7,10 @@ import { api } from '../lib/api.js';
 import { useCart } from '../context/CartContext.jsx';
 
 const METHODS = {
-  jazzcash: { label: 'JazzCash', emoji: '📱', accent: 'from-red-400 to-orange-400' },
-  easypaisa: { label: 'EasyPaisa', emoji: '💚', accent: 'from-emerald-500 to-green-400' }
+  jazzcash: { label: 'JazzCash', emoji: '📱', accent: 'from-red-400 to-orange-400' }
 };
 
-const methodKey = (paymentMethod) => {
-  const m = (paymentMethod || '').toLowerCase();
-  if (m.includes('easy')) return 'easypaisa';
-  return 'jazzcash';
-};
+const methodKey = () => 'jazzcash';
 
 export default function PaymentProof() {
   const { orderId } = useParams();

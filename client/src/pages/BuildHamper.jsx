@@ -33,11 +33,6 @@ export default function BuildHamper() {
   const [submitting, setSubmitting] = useState(false);
   const [orderResult, setOrderResult] = useState(null);
   const [form, setForm] = useState({ customer_name: '', address: '', phone: '', payment_method: 'jazzcash' });
-  const [paymentStatus, setPaymentStatus] = useState({ jazzcash: false, easypaisa: false });
-
-  useEffect(() => {
-    fetch('/api/payments/status').then(r => r.json()).then(setPaymentStatus).catch(() => {});
-  }, []);
   const [customBudget, setCustomBudget] = useState('');
 
   const cart = useCart();
@@ -296,13 +291,12 @@ export default function BuildHamper() {
               <Input label="Phone (WhatsApp)" value={form.phone} onChange={v => setForm({ ...form, phone: v })} />
               <div>
                 <label className="text-sm text-wrap-plum/70 mb-2 block">Payment Method</label>
-                <div className="grid grid-cols-2 gap-2">
-                  <PayBtn active={form.payment_method === 'jazzcash'} onClick={() => setForm({ ...form, payment_method: 'jazzcash' })}>
-                    📱 JazzCash
-                  </PayBtn>
-                  <PayBtn active={form.payment_method === 'easypaisa'} onClick={() => setForm({ ...form, payment_method: 'easypaisa' })}>
-                    💚 EasyPaisa
-                  </PayBtn>
+                <div className="card p-4 bg-wrap-blush/40 border border-wrap-pink/30 flex items-center gap-3">
+                  <span className="text-2xl">📱</span>
+                  <div>
+                    <div className="font-display text-wrap-plum">JazzCash</div>
+                    <div className="text-xs text-wrap-plum/60">Manual payment with receipt verification</div>
+                  </div>
                 </div>
                 <p className="text-xs text-wrap-plum/60 mt-2">
                   After placing order, you'll see account details to pay manually and upload a receipt screenshot for verification.

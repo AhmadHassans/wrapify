@@ -73,7 +73,7 @@ const computeTotal = ({ items = [], packaging, addons = [] }) => {
 
 const needsVerification = (method) => {
   const m = (method || '').toLowerCase();
-  return ['jazzcash', 'easypaisa'].includes(m);
+  return m === 'jazzcash';
 };
 
 router.post('/', (req, res) => {
