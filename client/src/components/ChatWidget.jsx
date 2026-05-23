@@ -62,7 +62,7 @@ export default function ChatWidget() {
     <>
       <button
         onClick={() => setOpen(o => !o)}
-        className="fixed bottom-5 right-5 z-50 w-14 h-14 rounded-full text-white shadow-pop flex items-center justify-center text-2xl transition-transform hover:scale-110"
+        className="fixed bottom-5 left-5 z-50 w-14 h-14 rounded-full text-white shadow-pop flex items-center justify-center text-2xl transition-transform hover:scale-110"
         style={{ background: 'linear-gradient(135deg, #E8508E 0%, #C73E6F 100%)' }}
         aria-label="Open chat"
       >
@@ -70,7 +70,7 @@ export default function ChatWidget() {
       </button>
 
       {open && (
-        <div className="fixed bottom-24 right-5 z-50 w-[360px] max-w-[calc(100vw-2.5rem)] h-[520px] max-h-[calc(100dvh-8rem)] bg-white rounded-3xl shadow-pop border border-wrap-rose/15 flex flex-col overflow-hidden animate-fadeUp">
+        <div className="fixed bottom-24 left-5 z-50 w-[360px] max-w-[calc(100vw-2.5rem)] h-[520px] max-h-[calc(100dvh-8rem)] bg-white rounded-3xl shadow-pop border border-wrap-rose/15 flex flex-col overflow-hidden animate-fadeUp">
           <div className="px-5 py-4 border-b border-wrap-rose/10 flex items-center justify-between" style={{ background: 'linear-gradient(135deg, #F5D9E2 0%, #FBF1F0 100%)' }}>
             <div>
               <div className="font-display text-lg text-wrap-plum">Wrapify Assistant ✨</div>
