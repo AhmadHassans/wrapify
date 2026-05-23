@@ -21,9 +21,8 @@ const PACKAGING_LABELS = {
 };
 
 const TRUST = [
-  '✨ Handcrafted with love',
+  '🚚 Delivery all over Pakistan',
   '💌 Personalized notes',
-  '🎀 Eid-ready packaging',
   '💖 Custom themes'
 ];
 
@@ -60,7 +59,7 @@ export default function HomePage() {
           <h1 className="font-display text-5xl md:text-7xl leading-[1.05] animate-fadeUp">
             <span className="text-gradient">Build Your Own</span>
             <br />
-            <span className="text-wrap-plum">Eidi Hamper</span>
+            <span className="text-wrap-plum">Hamper</span>
             <span className="inline-block animate-float ml-2">🎁</span>
           </h1>
           <p className="mt-6 text-lg md:text-xl text-wrap-plum/75 max-w-xl mx-auto animate-fadeUp italic" style={{ animationDelay: '120ms' }}>
