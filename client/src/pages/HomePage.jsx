@@ -5,6 +5,7 @@ import Footer from '../components/Footer.jsx';
 import ProductCard from '../components/ProductCard.jsx';
 import Cart from '../components/Cart.jsx';
 import Reveal from '../components/Reveal.jsx';
+import ParticleNetwork from '../components/ParticleNetwork.jsx';
 import { api, imgUrl, thumbUrl } from '../lib/api.js';
 
 const STEPS = [
@@ -49,6 +50,7 @@ export default function HomePage() {
 
       {/* HERO */}
       <section className="relative hero-bg">
+        <ParticleNetwork />
         <div className="blob bg-wrap-pink w-[420px] h-[420px] -top-32 -left-32 animate-blob" />
         <div className="blob bg-wrap-lilac w-[380px] h-[380px] top-1/2 -right-32 animate-blob" style={{ animationDelay: '4s' }} />
         <div className="blob bg-wrap-dusty w-[300px] h-[300px] bottom-0 left-1/3 animate-blob" style={{ animationDelay: '8s' }} />

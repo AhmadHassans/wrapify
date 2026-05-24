@@ -8,6 +8,7 @@ import PaymentResult from './pages/PaymentResult.jsx';
 import PaymentProof from './pages/PaymentProof.jsx';
 import ProductDetail from './pages/ProductDetail.jsx';
 import ChatWidget from './components/ChatWidget.jsx';
+import CursorTrail from './components/CursorTrail.jsx';
 
 if (typeof window !== 'undefined' && 'scrollRestoration' in window.history) {
   window.history.scrollRestoration = 'manual';
@@ -49,22 +50,48 @@ function ScrollManager() {
 
 export default function App() {
   const loc = useLocation();
+  const navType = useNavigationType();
   const isAdmin = loc.pathname.startsWith('/admin');
+  const fadeKey = navType === 'POP' ? 'static' : loc.key;
+
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const handler = (e) => {
+      const btn = e.target.closest && e.target.closest('.btn, .btn-primary, .btn-outline, .btn-ghost');
+      if (!btn) return;
+      const rect = btn.getBoundingClientRect();
+      const ripple = document.createElement('span');
+      ripple.className = 'btn-ripple';
+      ripple.style.left = `${e.clientX - rect.left}px`;
+      ripple.style.top = `${e.clientY - rect.top}px`;
+      ripple.style.width = '20px';
+      ripple.style.height = '20px';
+      btn.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 620);
+    };
+
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, []);
 
   return (
     <>
       <ScrollManager />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/build" element={<BuildHamper />} />
-        <Route path="/product/:id" element={<ProductDetail />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="/payment/success" element={<PaymentResult success={true} />} />
-        <Route path="/payment/fail" element={<PaymentResult success={false} />} />
-        <Route path="/payment/proof/:orderId" element={<PaymentProof />} />
-        <Route path="*" element={<HomePage />} />
-      </Routes>
+      <CursorTrail />
+      <div key={fadeKey} className="page-fade">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/build" element={<BuildHamper />} />
+          <Route path="/product/:id" element={<ProductDetail />} />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/payment/success" element={<PaymentResult success={true} />} />
+          <Route path="/payment/fail" element={<PaymentResult success={false} />} />
+          <Route path="/payment/proof/:orderId" element={<PaymentProof />} />
+          <Route path="*" element={<HomePage />} />
+        </Routes>
+      </div>
       {!isAdmin && <ChatWidget />}
     </>
   );

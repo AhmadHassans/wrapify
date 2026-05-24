@@ -168,6 +168,116 @@ input:focus, textarea:focus, select:focus {
 }
 .marquee-container:hover .marquee-track { animation-play-state: paused; }
 
+/* ============ CURSOR TRAIL ============ */
+@media (hover: hover) and (pointer: fine) {
+  .cursor-on body { cursor: none; }
+  .cursor-on a, .cursor-on button, .cursor-on input, .cursor-on textarea, .cursor-on select, .cursor-on [role="button"] { cursor: none; }
+
+  .wrap-cursor-dot {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 9999px;
+    background: radial-gradient(circle, #ffffff 0%, #ffd0e3 40%, #E8508E 100%);
+    box-shadow: 0 0 14px rgba(232,80,142,0.7), 0 0 28px rgba(232,80,142,0.35);
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    mix-blend-mode: normal;
+    transition: width 0.18s ease, height 0.18s ease, background 0.2s ease;
+  }
+  .wrap-cursor-dot.hovering {
+    width: 22px;
+    height: 22px;
+  }
+
+  .wrap-cursor-trail {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background: rgba(232,80,142,0.55);
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    animation: cursorTrailFade 0.6s ease-out forwards;
+  }
+}
+
+@keyframes cursorTrailFade {
+  0%   { opacity: 0.75; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0;    transform: translate(-50%, -50%) scale(0.3); }
+}
+
+/* ============ BUTTON PULSE + RIPPLE ============ */
+.btn-primary {
+  animation: pulseGlow 3.2s ease-in-out infinite;
+}
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 6px 20px rgba(232,80,142,0.22), 0 0 0 0 rgba(232,80,142,0.0); }
+  50%      { box-shadow: 0 10px 28px rgba(232,80,142,0.38), 0 0 0 6px rgba(232,80,142,0.08); }
+}
+
+.btn:hover { transform: translateY(-2px) scale(1.03); }
+
+.btn-ripple {
+  position: absolute;
+  border-radius: 9999px;
+  background: rgba(255,255,255,0.55);
+  transform: translate(-50%, -50%) scale(0);
+  pointer-events: none;
+  animation: buttonRipple 0.6s ease-out forwards;
+}
+@keyframes buttonRipple {
+  to { transform: translate(-50%, -50%) scale(8); opacity: 0; }
+}
+
+/* ============ PAGE TRANSITION ============ */
+.page-fade {
+  animation: pageFade 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes pageFade {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============ BOUNCE POP (cart item) ============ */
+@keyframes bouncePop {
+  0%   { transform: scale(0.85); opacity: 0; }
+  60%  { transform: scale(1.06); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.animate-bouncePop { animation: bouncePop 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* ============ IMAGE SHIMMER SWEEP (on hover) ============ */
+.shimmer-on-hover { position: relative; overflow: hidden; }
+.shimmer-on-hover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,0.45) 50%, transparent 70%);
+  transform: translateX(-120%);
+  pointer-events: none;
+  transition: transform 0.7s ease;
+}
+.shimmer-on-hover:hover::after { transform: translateX(120%); }
+
+/* ============ CLICK RIPPLE (cards/images) ============ */
+.click-ripple {
+  position: absolute;
+  border-radius: 9999px;
+  background: rgba(232,80,142,0.35);
+  transform: translate(-50%, -50%) scale(0);
+  pointer-events: none;
+  animation: rippleClick 0.65s ease-out forwards;
+  z-index: 5;
+}
+@keyframes rippleClick {
+  to { transform: translate(-50%, -50%) scale(10); opacity: 0; }
+}
+
 /* ============ MOTION-SAFE FALLBACK ============ */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

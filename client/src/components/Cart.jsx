@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { useCart } from '../context/CartContext.jsx';
 import { imgUrl, thumbUrl } from '../lib/api.js';
 import { useNavigate } from 'react-router-dom';
@@ -5,6 +6,31 @@ import { useNavigate } from 'react-router-dom';
 export default function Cart({ open, onClose }) {
   const { items, removeItem, updateQty, total, packaging, addons, itemCount } = useCart();
   const nav = useNavigate();
+  const prevKeys = useRef(new Set());
+  const [poppingKeys, setPoppingKeys] = useState(new Set());
+
+  useEffect(() => {
+    const currentKeys = new Set(items.map(it => `${it.id}:${it.variant || ''}:${it.size || ''}`));
+    const added = [];
+    currentKeys.forEach(k => { if (!prevKeys.current.has(k)) added.push(k); });
+    if (added.length > 0) {
+      setPoppingKeys(prev => {
+        const next = new Set(prev);
+        added.forEach(k => next.add(k));
+        return next;
+      });
+      const t = setTimeout(() => {
+        setPoppingKeys(prev => {
+          const next = new Set(prev);
+          added.forEach(k => next.delete(k));
+          return next;
+        });
+      }, 550);
+      prevKeys.current = currentKeys;
+      return () => clearTimeout(t);
+    }
+    prevKeys.current = currentKeys;
+  }, [items]);
 
   return (
     <>
@@ -36,8 +62,10 @@ export default function Cart({ open, onClose }) {
             </div>
           ) : (
             <ul className="space-y-4">
-              {items.map((it) => (
-                <li key={`${it.id}:${it.variant || ''}:${it.size || ''}`} className="flex gap-3">
+              {items.map((it) => {
+                const key = `${it.id}:${it.variant || ''}:${it.size || ''}`;
+                return (
+                <li key={key} className={`flex gap-3 ${poppingKeys.has(key) ? 'animate-bouncePop' : ''}`}>
                   {it.image && (
                     <img src={thumbUrl(it.image)} alt="" loading="lazy" decoding="async" width="64" height="64" className="w-16 h-16 rounded-2xl object-cover bg-wrap-blush" />
                   )}
@@ -57,7 +85,8 @@ export default function Cart({ open, onClose }) {
                     </div>
                   </div>
                 </li>
-              ))}
+                );
+              })}
             </ul>
           )}
 

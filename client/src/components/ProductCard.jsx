@@ -69,10 +69,23 @@ export default function ProductCard({ product, compact = false }) {
     setImgIdx(i);
   };
 
+  const handleCardClick = (e) => {
+    const target = e.currentTarget;
+    const rect = target.getBoundingClientRect();
+    const ripple = document.createElement('span');
+    ripple.className = 'click-ripple';
+    ripple.style.left = `${e.clientX - rect.left}px`;
+    ripple.style.top = `${e.clientY - rect.top}px`;
+    ripple.style.width = '20px';
+    ripple.style.height = '20px';
+    target.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 650);
+  };
+
   return (
-    <Link to={`/product/${product.id}`} className="block">
-      <div className="card group hover:shadow-pop hover:-translate-y-2 transition-all duration-500">
-        <div className="relative aspect-square bg-gradient-to-br from-wrap-blush to-wrap-cream overflow-hidden">
+    <Link to={`/product/${product.id}`} className="block" onClick={handleCardClick}>
+      <div className="card group hover:shadow-pop hover:-translate-y-2 transition-all duration-500 relative overflow-hidden">
+        <div className="relative aspect-square bg-gradient-to-br from-wrap-blush to-wrap-cream overflow-hidden shimmer-on-hover">
           {displayImage && (
             <img
               src={thumbUrl(displayImage)}
