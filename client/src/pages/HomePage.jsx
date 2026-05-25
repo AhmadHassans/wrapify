@@ -51,7 +51,8 @@ export default function HomePage() {
     });
   }, [loc.key, loc.state, loading]);
 
-  const featured = products.filter(p => !p.is_addon && !p.packaging_type);
+  const readyHampers = products.filter(p => p.is_ready_hamper && !p.is_addon && !p.packaging_type);
+  const featured = products.filter(p => !p.is_addon && !p.packaging_type && !p.is_ready_hamper);
   const addons = products.filter(p => p.is_addon);
   const packagingProducts = products.filter(p => p.packaging_type);
 
@@ -149,6 +150,28 @@ export default function HomePage() {
           })}
         </div>
       </section>
+
+      {/* READY HAMPERS */}
+      {readyHampers.length > 0 && (
+        <section id="ready_hampers" className="section">
+          <Reveal>
+            <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
+              <div>
+                <div className="text-xs uppercase tracking-[0.25em] text-wrap-rose/80 mb-2">✦ One-click gifting</div>
+                <h2 className="font-display text-4xl md:text-5xl"><span className="text-gradient">Ready</span> Hampers</h2>
+                <p className="text-wrap-plum/70 mt-2">Pre-made hampers — order with a single click.</p>
+              </div>
+            </div>
+          </Reveal>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+            {readyHampers.map((p, i) => (
+              <Reveal key={p.id} delay={(i % 4) * 80}>
+                <ProductCard product={p} from="ready_hampers" />
+              </Reveal>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* FEATURED PRODUCTS */}
       <section id="featured" className="section">

@@ -37,6 +37,7 @@ const parseJSON = (s, fallback) => {
 const formatProduct = (p) => ({
   ...p,
   is_addon: !!p.is_addon,
+  is_ready_hamper: !!p.is_ready_hamper,
   is_active: !!p.is_active,
   images: Array.isArray(p.images) ? p.images : [],
   variants: Array.isArray(p.variants) ? p.variants : [],
@@ -77,7 +78,8 @@ router.post('/', upload.any(), async (req, res) => {
   const {
     name, description = '', price = 0,
     label = '', packaging_type = '',
-    is_addon = '0', deals = '', is_active = '1'
+    is_addon = '0', is_ready_hamper = '0',
+    deals = '', is_active = '1'
   } = req.body;
 
   if (!name) return res.status(400).json({ error: 'name required' });
@@ -112,6 +114,7 @@ router.post('/', upload.any(), async (req, res) => {
     label,
     packaging_type,
     is_addon: is_addon === '1' || is_addon === 1 || is_addon === true ? 1 : 0,
+    is_ready_hamper: is_ready_hamper === '1' || is_ready_hamper === 1 || is_ready_hamper === true ? 1 : 0,
     images,
     variants,
     sizes,
@@ -166,6 +169,9 @@ router.put('/:id', upload.any(), async (req, res) => {
     is_addon: body.is_addon !== undefined
       ? (body.is_addon === '1' || body.is_addon === 1 || body.is_addon === true ? 1 : 0)
       : existing.is_addon,
+    is_ready_hamper: body.is_ready_hamper !== undefined
+      ? (body.is_ready_hamper === '1' || body.is_ready_hamper === 1 || body.is_ready_hamper === true ? 1 : 0)
+      : (existing.is_ready_hamper || 0),
     images,
     variants,
     sizes,

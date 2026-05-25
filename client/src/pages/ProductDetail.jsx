@@ -19,7 +19,7 @@ const swatchHex = (name) => {
 
 const variantColor = (v) => v?.hex || swatchHex(v?.color);
 
-const SECTION_LABELS = { featured: 'Featured Goodies', packaging: 'Packaging Options', addons: 'Cute Add-ons' };
+const SECTION_LABELS = { featured: 'Featured Goodies', ready_hampers: 'Ready Hampers', packaging: 'Packaging Options', addons: 'Cute Add-ons' };
 
 export default function ProductDetail() {
   const { id } = useParams();

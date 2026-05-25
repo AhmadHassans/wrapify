@@ -231,6 +231,7 @@ const products = {
       label: obj.label || '',
       packaging_type: obj.packaging_type || '',
       is_addon: obj.is_addon ? 1 : 0,
+      is_ready_hamper: obj.is_ready_hamper ? 1 : 0,
       images: Array.isArray(obj.images) ? obj.images : [],
       variants: Array.isArray(obj.variants) ? obj.variants : [],
       sizes: Array.isArray(obj.sizes) ? obj.sizes : [],

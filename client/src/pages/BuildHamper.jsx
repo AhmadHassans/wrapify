@@ -44,7 +44,7 @@ export default function BuildHamper() {
     api.get('/api/products').then(setProducts).catch(console.error);
   }, []);
 
-  const items_for_purchase = products.filter(p => !p.is_addon && !p.packaging_type);
+  const items_for_purchase = products.filter(p => !p.is_addon && !p.packaging_type && !p.is_ready_hamper);
   const addonProducts = products.filter(p => p.is_addon);
   const packagingProducts = products.filter(p => p.packaging_type);
 

@@ -4,6 +4,7 @@ import { api, imgUrl, thumbUrl } from '../lib/api.js';
 
 const TABS = [
   { id: 'items', label: 'Items', emoji: '🛍️' },
+  { id: 'ready_hampers', label: 'Ready Hampers', emoji: '💝' },
   { id: 'packaging', label: 'Packaging', emoji: '📦' },
   { id: 'addons', label: 'Add-ons', emoji: '✨' },
   { id: 'orders', label: 'Orders', emoji: '🛒' },
@@ -11,7 +12,8 @@ const TABS = [
 ];
 
 const filterByTab = (tab) => {
-  if (tab === 'items') return (p) => !p.is_addon && !p.packaging_type;
+  if (tab === 'items') return (p) => !p.is_addon && !p.packaging_type && !p.is_ready_hamper;
+  if (tab === 'ready_hampers') return (p) => !!p.is_ready_hamper && !p.is_addon && !p.packaging_type;
   if (tab === 'packaging') return (p) => !!p.packaging_type;
   if (tab === 'addons') return (p) => !!p.is_addon;
   return () => true;
@@ -59,6 +61,7 @@ export default function AdminDashboard() {
 
   const counts = {
     items: products.filter(filterByTab('items')).length,
+    ready_hampers: products.filter(filterByTab('ready_hampers')).length,
     packaging: products.filter(filterByTab('packaging')).length,
     addons: products.filter(filterByTab('addons')).length,
     orders: orders.length,
@@ -69,7 +72,7 @@ export default function AdminDashboard() {
 
   const showForm = formOpen;
   const formType = editing
-    ? (editing.is_addon ? 'addons' : (editing.packaging_type ? 'packaging' : 'items'))
+    ? (editing.is_addon ? 'addons' : (editing.packaging_type ? 'packaging' : (editing.is_ready_hamper ? 'ready_hampers' : 'items')))
     : (tab === 'add' ? 'all' : tab);
 
   return (
@@ -121,6 +124,7 @@ export default function AdminDashboard() {
 
 const TAB_META = {
   items: { title: 'Items', singular: 'Item', addLabel: '+ Add Item', emptyIcon: '🛍️', emptyHint: 'Add your first product to start showing it in the Build Hamper flow.' },
+  ready_hampers: { title: 'Ready Hampers', singular: 'Ready Hamper', addLabel: '+ Add Ready Hamper', emptyIcon: '💝', emptyHint: 'Add pre-made hampers customers can buy with one click.' },
   packaging: { title: 'Packaging', singular: 'Packaging Option', addLabel: '+ Add Packaging', emptyIcon: '📦', emptyHint: 'Add Basket, Gift Box, Transparent Box, or Net Wrapping.' },
   addons: { title: 'Add-ons', singular: 'Add-on', addLabel: '+ Add Add-on', emptyIcon: '✨', emptyHint: 'Add Eid cards, handwritten notes, or extra surprises.' }
 };
@@ -327,6 +331,7 @@ function OrdersTable({ orders, reload }) {
 
 const FORM_META = {
   items: { title: 'Item', priceLabel: 'Price (Rs.)', showDescription: true, showLabel: true, showDeal: true, showVariants: true, showSizes: true, showImages: true, showPackagingType: false, showAddonToggle: false },
+  ready_hampers: { title: 'Ready Hamper', priceLabel: 'Price (Rs.)', showDescription: true, showLabel: true, showDeal: true, showVariants: false, showSizes: false, showImages: true, showPackagingType: false, showAddonToggle: false },
   packaging: { title: 'Packaging Option', priceLabel: 'Extra Cost (Rs.)', showDescription: true, showLabel: false, showDeal: false, showVariants: false, showSizes: false, showImages: true, showPackagingType: true, showAddonToggle: false },
   addons: { title: 'Add-on', priceLabel: 'Extra Cost (Rs.)', showDescription: false, showLabel: false, showDeal: false, showVariants: false, showSizes: false, showImages: true, showPackagingType: false, showAddonToggle: false },
   all: { title: 'Product', priceLabel: 'Base Price (Rs.)', showDescription: true, showLabel: true, showDeal: true, showVariants: true, showSizes: true, showImages: true, showPackagingType: true, showAddonToggle: true }
@@ -383,6 +388,8 @@ function ProductForm({ initial, formType = 'items', onDone }) {
       const pt = formType === 'packaging' ? packagingType : (formType === 'all' ? packagingType : '');
       fd.append('packaging_type', pt);
       fd.append('is_addon', isAddon ? '1' : '0');
+      const isReadyHamper = formType === 'ready_hampers' || (initial && initial.is_ready_hamper);
+      fd.append('is_ready_hamper', isReadyHamper ? '1' : '0');
       fd.append('is_active', isActive ? '1' : '0');
       fd.append('deals', meta.showDeal ? deals : '');
       fd.append('existing_images', JSON.stringify(existingImages));
