@@ -20,7 +20,7 @@ const swatchHex = (name) => {
 
 const variantColor = (v) => v?.hex || swatchHex(v?.color);
 
-export default function ProductCard({ product, compact = false }) {
+export default function ProductCard({ product, compact = false, from }) {
   const { addItem } = useCart();
   const [variantIdx, setVariantIdx] = useState(0);
   const [imgIdx, setImgIdx] = useState(0);
@@ -83,7 +83,7 @@ export default function ProductCard({ product, compact = false }) {
   };
 
   return (
-    <Link to={`/product/${product.id}`} className="block" onClick={handleCardClick}>
+    <Link to={`/product/${product.id}`} state={from ? { from } : undefined} className="block" onClick={handleCardClick}>
       <div className="card group hover:shadow-pop hover:-translate-y-2 transition-all duration-500 relative overflow-hidden">
         <div className="relative aspect-square bg-gradient-to-br from-wrap-blush to-wrap-cream overflow-hidden shimmer-on-hover">
           {displayImage && (

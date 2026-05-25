@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import ProductCard from '../components/ProductCard.jsx';
@@ -10,7 +10,7 @@ import { api, imgUrl, thumbUrl } from '../lib/api.js';
 
 const STEPS = [
   { icon: '🎯', title: 'Set Your Budget', desc: 'Tell us how much you want to spend.', to: '/build' },
-  { icon: '🛍️', title: 'Choose Your Items', desc: 'Mix and match goodies for your loved one.', scrollTo: 'products' },
+  { icon: '🛍️', title: 'Choose Your Items', desc: 'Mix and match goodies for your loved one.', scrollTo: 'featured' },
   { icon: '📦', title: 'We Pack & Deliver', desc: 'We wrap with love and deliver to your door.', to: '/build' }
 ];
 
@@ -31,6 +31,7 @@ export default function HomePage() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [cartOpen, setCartOpen] = useState(false);
+  const loc = useLocation();
 
   useEffect(() => {
     api.get('/api/products')
@@ -38,6 +39,29 @@ export default function HomePage() {
       .catch(e => console.error(e))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    const target = loc.state?.scrollTo;
+    if (!target) return;
+    let cancelled = false;
+    const onUser = () => { cancelled = true; };
+    const listenerTimer = setTimeout(() => {
+      window.addEventListener('wheel', onUser, { once: true, passive: true });
+      window.addEventListener('touchstart', onUser, { once: true, passive: true });
+    }, 80);
+    const attempts = [50, 150, 300, 500, 800, 1200];
+    const timers = attempts.map(t => setTimeout(() => {
+      if (cancelled) return;
+      const el = document.getElementById(target);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, t));
+    return () => {
+      clearTimeout(listenerTimer);
+      timers.forEach(clearTimeout);
+      window.removeEventListener('wheel', onUser);
+      window.removeEventListener('touchstart', onUser);
+    };
+  }, [loc.key, loc.state]);
 
   const featured = products.filter(p => !p.is_addon && !p.packaging_type);
   const addons = products.filter(p => p.is_addon);
@@ -139,7 +163,7 @@ export default function HomePage() {
       </section>
 
       {/* FEATURED PRODUCTS */}
-      <section id="products" className="section">
+      <section id="featured" className="section">
         <Reveal>
           <div className="flex items-end justify-between mb-10 flex-wrap gap-4">
             <div>
@@ -166,7 +190,7 @@ export default function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             {featured.map((p, i) => (
               <Reveal key={p.id} delay={(i % 4) * 80}>
-                <ProductCard product={p} />
+                <ProductCard product={p} from="featured" />
               </Reveal>
             ))}
           </div>
@@ -174,7 +198,7 @@ export default function HomePage() {
       </section>
 
       {/* PACKAGING */}
-      <section className="section">
+      <section id="packaging" className="section">
         <Reveal>
           <div className="text-center mb-10">
             <div className="text-xs uppercase tracking-[0.25em] text-wrap-rose/80 mb-2">✦ Wrap it up</div>
@@ -186,7 +210,7 @@ export default function HomePage() {
             const meta = PACKAGING_LABELS[p.packaging_type] || { name: p.name, emoji: '📦' };
             return (
               <Reveal key={p.id} delay={i * 80}>
-                <Link to={`/product/${p.id}`} className="card p-5 text-center hover:shadow-pop hover:-translate-y-1 transition-all group cursor-pointer block">
+                <Link to={`/product/${p.id}`} state={{ from: 'packaging' }} className="card p-5 text-center hover:shadow-pop hover:-translate-y-1 transition-all group cursor-pointer block">
                   <div className="text-5xl mb-2 inline-block group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">{meta.emoji}</div>
                   {p.images?.[0] && (
                     <div className="overflow-hidden rounded-2xl mb-3">
@@ -204,7 +228,7 @@ export default function HomePage() {
 
       {/* ADD-ONS */}
       {addons.length > 0 && (
-        <section className="section">
+        <section id="addons" className="section">
           <Reveal>
             <div className="text-center mb-10">
               <div className="text-xs uppercase tracking-[0.25em] text-wrap-rose/80 mb-2">✦ Extra love</div>
@@ -214,7 +238,7 @@ export default function HomePage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
             {addons.map((p, i) => (
               <Reveal key={p.id} delay={i * 100}>
-                <ProductCard product={p} compact />
+                <ProductCard product={p} compact from="addons" />
               </Reveal>
             ))}
           </div>

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 import Navbar from '../components/Navbar.jsx';
 import Footer from '../components/Footer.jsx';
 import ProductCard from '../components/ProductCard.jsx';
@@ -19,9 +19,14 @@ const swatchHex = (name) => {
 
 const variantColor = (v) => v?.hex || swatchHex(v?.color);
 
+const SECTION_LABELS = { featured: 'Featured Goodies', packaging: 'Packaging Options', addons: 'Cute Add-ons' };
+
 export default function ProductDetail() {
   const { id } = useParams();
   const nav = useNavigate();
+  const loc = useLocation();
+  const fromSection = loc.state?.from && SECTION_LABELS[loc.state.from] ? loc.state.from : 'featured';
+  const fromLabel = SECTION_LABELS[fromSection];
   const { addItem } = useCart();
   const [product, setProduct] = useState(null);
   const [related, setRelated] = useState([]);
@@ -112,7 +117,7 @@ export default function ProductDetail() {
         <nav className="text-sm text-wrap-plum/60 mb-6">
           <Link to="/" className="hover:text-wrap-rose">Home</Link>
           <span className="mx-2">›</span>
-          <Link to="/#products" className="hover:text-wrap-rose">Products</Link>
+          <Link to="/" state={{ scrollTo: fromSection }} className="hover:text-wrap-rose">{fromLabel}</Link>
           <span className="mx-2">›</span>
           <span className="text-wrap-plum">{product.name}</span>
         </nav>
