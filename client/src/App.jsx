@@ -21,32 +21,51 @@ function ScrollManager() {
   useLayoutEffect(() => {
     const key = loc.key || 'default';
 
+    if (navType !== 'POP' && loc.state && loc.state.scrollTo) {
+      return;
+    }
+
     if (navType === 'POP') {
       const saved = sessionStorage.getItem(`scroll:${key}`);
       if (saved !== null) {
         const target = parseInt(saved, 10);
+        let scrolled = false;
         let cancelled = false;
 
         const onUser = () => { cancelled = true; };
 
+        const doScroll = () => {
+          if (scrolled || cancelled) return;
+          const maxY = document.documentElement.scrollHeight - window.innerHeight;
+          if (maxY >= target - 40) {
+            scrolled = true;
+            window.scrollTo({ top: target, behavior: 'smooth' });
+          }
+        };
+
+        doScroll();
+
+        const ro = new ResizeObserver(() => doScroll());
+        ro.observe(document.body);
+
         const listenerTimer = setTimeout(() => {
           window.addEventListener('wheel', onUser, { once: true, passive: true });
           window.addEventListener('touchstart', onUser, { once: true, passive: true });
-        }, 60);
+        }, 80);
 
-        const attempts = [0, 16, 50, 120, 250, 500, 1000];
-        const timers = attempts.map(t => setTimeout(() => {
-          if (cancelled) return;
-          const maxY = document.documentElement.scrollHeight - window.innerHeight;
-          const goalY = Math.min(target, Math.max(0, maxY));
-          if (Math.abs(window.scrollY - goalY) > 4) {
-            window.scrollTo(0, goalY);
+        const fallbackTimer = setTimeout(() => {
+          if (!scrolled && !cancelled) {
+            scrolled = true;
+            const maxY = document.documentElement.scrollHeight - window.innerHeight;
+            window.scrollTo({ top: Math.min(target, Math.max(0, maxY)), behavior: 'smooth' });
           }
-        }, t));
+          ro.disconnect();
+        }, 2000);
 
         return () => {
+          ro.disconnect();
           clearTimeout(listenerTimer);
-          timers.forEach(clearTimeout);
+          clearTimeout(fallbackTimer);
           window.removeEventListener('wheel', onUser);
           window.removeEventListener('touchstart', onUser);
         };

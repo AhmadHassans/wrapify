@@ -43,25 +43,13 @@ export default function HomePage() {
   useEffect(() => {
     const target = loc.state?.scrollTo;
     if (!target) return;
-    let cancelled = false;
-    const onUser = () => { cancelled = true; };
-    const listenerTimer = setTimeout(() => {
-      window.addEventListener('wheel', onUser, { once: true, passive: true });
-      window.addEventListener('touchstart', onUser, { once: true, passive: true });
-    }, 80);
-    const attempts = [50, 150, 300, 500, 800, 1200];
-    const timers = attempts.map(t => setTimeout(() => {
-      if (cancelled) return;
-      const el = document.getElementById(target);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, t));
-    return () => {
-      clearTimeout(listenerTimer);
-      timers.forEach(clearTimeout);
-      window.removeEventListener('wheel', onUser);
-      window.removeEventListener('touchstart', onUser);
-    };
-  }, [loc.key, loc.state]);
+    if (loading) return;
+    const el = document.getElementById(target);
+    if (!el) return;
+    requestAnimationFrame(() => {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }, [loc.key, loc.state, loading]);
 
   const featured = products.filter(p => !p.is_addon && !p.packaging_type);
   const addons = products.filter(p => p.is_addon);
