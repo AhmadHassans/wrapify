@@ -73,7 +73,7 @@ export default function PaymentProof() {
       fd.append('sender_details', senderDetails.trim());
       fd.append('trx_id', trxId.trim());
       fd.append('receipt', receipt);
-      const res = await fetch(`/api/orders/${orderId}/payment-proof`, { method: 'POST', body: fd });
+      const res = await fetch(`${import.meta.env.VITE_API_BASE || ''}/api/orders/${orderId}/payment-proof`, { method: 'POST', body: fd });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Submission failed');
       setSubmitted(true);

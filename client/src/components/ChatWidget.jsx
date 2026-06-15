@@ -24,7 +24,7 @@ export default function ChatWidget() {
 
   useEffect(() => {
     if (!open || ollamaStatus !== null) return;
-    fetch('/api/chat/health').then(r => r.json()).then(setOllamaStatus).catch(() => setOllamaStatus({ ok: false }));
+    fetch(`${import.meta.env.VITE_API_BASE || ''}/api/chat/health`).then(r => r.json()).then(setOllamaStatus).catch(() => setOllamaStatus({ ok: false }));
   }, [open, ollamaStatus]);
 
   const send = async () => {
@@ -35,7 +35,7 @@ export default function ChatWidget() {
     setInput('');
     setLoading(true);
     try {
-      const r = await fetch('/api/chat', {
+      const r = await fetch(`${import.meta.env.VITE_API_BASE || ''}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: next.filter(m => m.role !== 'system') })
