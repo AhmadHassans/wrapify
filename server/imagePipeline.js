@@ -1,6 +1,12 @@
 const fs = require('fs');
 const path = require('path');
-const sharp = require('sharp');
+
+let sharp;
+const loadSharp = () => {
+  if (sharp !== undefined) return sharp;
+  try { sharp = require('sharp'); } catch (e) { console.warn('[imagePipeline] sharp not available:', e.message); sharp = null; }
+  return sharp;
+};
 
 const UPLOADS_DIR = path.join(__dirname, 'uploads');
 
@@ -9,6 +15,9 @@ const THUMB_WIDTH = 400;
 const QUALITY = 82;
 
 async function processOne(filename) {
+  const s = loadSharp();
+  if (!s) return filename;
+
   const srcPath = path.join(UPLOADS_DIR, filename);
   const ext = path.extname(filename).toLowerCase();
   if (ext === '.svg') return filename;
@@ -20,15 +29,15 @@ async function processOne(filename) {
   const thumbPath = path.join(UPLOADS_DIR, thumbName);
 
   try {
-    const meta = await sharp(srcPath).metadata();
+    const meta = await s(srcPath).metadata();
 
-    await sharp(srcPath)
+    await s(srcPath)
       .rotate()
       .resize({ width: Math.min(MAX_WIDTH, meta.width || MAX_WIDTH), withoutEnlargement: true })
       .webp({ quality: QUALITY })
       .toFile(outPath);
 
-    await sharp(srcPath)
+    await s(srcPath)
       .rotate()
       .resize({ width: Math.min(THUMB_WIDTH, meta.width || THUMB_WIDTH), withoutEnlargement: true })
       .webp({ quality: 78 })

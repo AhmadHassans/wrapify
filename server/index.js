@@ -15,7 +15,11 @@ const app = express();
 const PORT = process.env.PORT || 5050;
 
 const uploadsDir = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+try {
+  if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
+} catch (e) {
+  console.warn('[server] uploads dir not writable (read-only filesystem?):', e.message);
+}
 
 const corsOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
 app.use(cors({ origin: corsOrigin === '*' ? true : corsOrigin.split(',') }));
@@ -59,6 +63,10 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ error: err.message || 'Server error' });
 });
 
-app.listen(PORT, () => {
-  console.log(`[server] Wrapify API listening on :${PORT}`);
-});
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`[server] Wrapify API listening on :${PORT}`);
+  });
+}
+
+module.exports = app;
